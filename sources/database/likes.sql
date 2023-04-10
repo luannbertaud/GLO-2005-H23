@@ -10,6 +10,15 @@ FOREIGN KEY (post) REFERENCES Posts(id) ON DELETE CASCADE,
 FOREIGN KEY (sender) REFERENCES Users(username) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
+DELIMITER //
+CREATE TRIGGER CreateLikeNotification
+    AFTER INSERT ON Likes
+    FOR EACH ROW
+    BEGIN
+        INSERT INTO Notifications (id, type, status) VALUES (NEW.id, 'like', 'unread');
+		END; //
+DELIMITER ;
+
 INSERT INTO Likes (id, post, sender, timestamp)
 VALUES
 (8, 981, "CosmicCougar",'2023-02-01 04:09:06'),

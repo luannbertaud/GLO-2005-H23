@@ -1,7 +1,4 @@
-import os
-
 import pymysql
-from os import listdir
 
 connection = pymysql.connect(
     host="localhost",
@@ -11,7 +8,4 @@ connection = pymysql.connect(
     autocommit=True
 )
 
-cursor = connection.cursor()
-
-if __name__ == '__main__':
-    test = open("./database/users.sql", 'r')
+cursor=connection.cursor()

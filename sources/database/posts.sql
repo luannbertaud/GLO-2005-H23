@@ -112,5 +112,3 @@ VALUES
 (809, "EmeraldEagle", "La gratitude est la plus belle fleur qui jaillit de l'âme.", 'Optima', '2023-02-19 12:08:49'),
 (717, "MysticMosquito", "Le monde est un livre, et ceux qui ne voyagent pas n'en lisent qu'une page.", 'Segoe UI', '2023-01-08 02:31:05'),
 (658, "ElectricEagleRay", "La sagesse, c'est d'avoir des rêves suffisamment grands pour ne pas les perdre de vue lorsqu'on les poursuit.", 'Trebuchet MS', '2023-01-16 11:45:09');
-
-SELECT * FROM Posts;

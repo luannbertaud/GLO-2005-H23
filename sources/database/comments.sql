@@ -11,6 +11,15 @@ FOREIGN KEY (post) REFERENCES Posts(id) ON DELETE CASCADE,
 FOREIGN KEY (sender) REFERENCES Users(username) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
+DELIMITER //
+CREATE TRIGGER CreateCommentNotification
+    AFTER INSERT ON Comments
+    FOR EACH ROW
+    BEGIN
+        INSERT INTO Notifications (id, type, status) VALUES (NEW.id, 'comment', 'unread');
+		END; //
+DELIMITER ;
+
 INSERT INTO Comments (id, post, sender, body, timestamp)
 VALUES
 (159, 92, "EmeraldDragonfly", "Cette citation d'Albert Einstein est un rappel important que l'échec est souvent une étape nécessaire sur le chemin de l'innovation.", '2023-01-03 00:31:47'),
@@ -92,24 +101,24 @@ VALUES
 (742, 993, "SapphireJazz","L'échec peut sembler décourageant, mais cette citation nous encourage à continuer à travailler dur et à persévérer jusqu'à ce que nous atteignions notre objectif.", '2023-03-17 09:20:11'),
 (743, 790, "MysticWombat","Cette citation nous rappelle que l'échec est une occasion de réévaluer nos objectifs et de découvrir de nouvelles opportunités pour réussir.", '2023-03-31 14:48:27'),
 (759, 790, "ElectricPenguin", "J'aime cette citation car elle nous encourage à ne pas avoir peur de l'échec et à continuer à persévérer jusqu'à ce que nous atteignions notre but.", '2023-01-25 11:44:08'),
-(809, 724, "EmeraldDragonfly", "    Cette citation nous rappelle que l'échec ne définit pas notre valeur en tant que personne, mais plutôt notre capacité à rebondir.", '2023-03-14 16:56:52'),
-(768, 790, "CosmicChameleon", "    L'échec peut sembler décourageant, mais cette citation nous encourage à garder une attitude positive et à continuer à travailler dur pour atteindre nos objectifs.", '2023-03-01 21:02:16'),
-(769, 658, "VelvetPhoenix", "    Cette citation nous rappelle que chaque échec est une occasion de réfléchir sur nos méthodes et d'essayer de nouvelles approches pour atteindre notre but.", '2023-03-23 06:56:34'),
-(773, 658, "RadiantLynx", "    J'aime cette citation car elle nous encourage à ne pas avoir peur de l'échec et à continuer à persévérer malgré les obstacles.", '2023-01-20 12:21:19'),
-(774, 658, "LunarSphinx", "    Cette citation nous rappelle que la réussite n'est pas uniquement basée sur les résultats, mais aussi sur notre processus et notre attitude face à l'échec.", '2023-02-13 21:36:27'),
-(790, 773, "GalacticSailor", "    L'échec peut sembler insurmontable, mais cette citation nous rappelle que nous avons le pouvoir de choisir notre réponse à l'échec et de continuer à avancer.", '2023-02-28 09:14:25'),
-(792, 773, "CrimsonCobra", "    Cette citation nous encourage à ne pas se laisser décourager par l'échec et à continuer à travailler dur pour atteindre nos objectifs.", '2023-01-19 16:27:53'),
-(796, 773, "CelestialRaven", "    J'aime cette citation car elle nous rappelle que l'échec peut être une source de motivation pour continuer à travailler dur et à persévérer.", '2023-01-18 07:03:55'),
-(801, 724, "SilverStallion", "    Cette citation nous rappelle que chaque échec est une occasion de grandir et de devenir plus fort en tant que personne.", '2023-01-07 06:12:02'),
-(804, 724, "EnigmaticKraken", "    L'échec peut sembler décourageant, mais cette citation nous encourage à ne pas abandonner et à continuer à avancer malgré les difficultés.", '2023-03-03 07:00:48'),
-(810, 940, "MysticMoose", "    Cette citation nous rappelle que la persévérance et la détermination sont les clés de la réussite face à l'échec.", '2023-03-25 19:21:27'),
-(837, 940, "FieryFalcon", "    J'aime cette citation car elle nous encourage à ne pas avoir peur de l'échec et à continuer à essayer jusqu'à ce que nous atteignions notre but.", '2023-02-28 12:46:12'),
-(870, 940, "OceanicOctopus", "    Cette citation nous rappelle que l'échec peut être un enseignement précieux pour nous aider à prendre des décisions plus avisées à l'avenir.", '2023-02-15 17:54:57'),
-(882, 717, "CrimsonCheetah", "    L'échec peut sembler décourageant, mais cette citation nous encourage à garder la foi en nous-mêmes et à continuer à travailler dur pour atteindre nos objectifs.", '2023-01-29 10:36:02'),
-(901, 717, "CosmicCactus", "    Cette citation nous rappelle que l'échec est un élément naturel de tout processus créatif et qu'il peut être utilisé comme source d'inspiration pour nous aider à innover.", '2023-01-03 08:32:05'),
-(902, 717, "EnchantedElk", "    J'aime cette citation car elle nous encourage à ne pas se laisser abattre par l'échec, mais plutôt à le voir comme une occasion de nous améliorer.", '2023-03-30 09:57:21'),
-(907, 743, "RadiantRaccoon", "    Cette citation nous rappelle que chaque échec est une occasion de réévaluer nos priorités et de nous concentrer sur ce qui est vraiment important pour nous.", '2023-04-07 18:13:55'),
-(910, 743, "JadeJaguar", "    L'échec peut sembler insurmontable, mais cette citation nous rappelle que nous avons la capacité de surmonter nos obstacles et d'atteindre nos objectifs.", '2023-03-14 03:05:23'),
-(940, 743, "StarrySwan", "    Cette citation nous encourage à ne pas avoir peur de l'échec et à continuer à travailler dur pour réaliser notre potentiel.", '2023-03-15 12:26:40'),
-(981, 691, "ElectricEagle", "    J'aime cette citation car elle nous rappelle que même les échecs les plus douloureux peuvent être surmontés avec le temps et la persévérance.", '2023-03-09 13:53:26'),
+(809, 724, "EmeraldDragonfly", "Cette citation nous rappelle que l'échec ne définit pas notre valeur en tant que personne, mais plutôt notre capacité à rebondir.", '2023-03-14 16:56:52'),
+(768, 790, "CosmicChameleon", "L'échec peut sembler décourageant, mais cette citation nous encourage à garder une attitude positive et à continuer à travailler dur pour atteindre nos objectifs.", '2023-03-01 21:02:16'),
+(769, 658, "VelvetPhoenix", "Cette citation nous rappelle que chaque échec est une occasion de réfléchir sur nos méthodes et d'essayer de nouvelles approches pour atteindre notre but.", '2023-03-23 06:56:34'),
+(773, 658, "RadiantLynx", "J'aime cette citation car elle nous encourage à ne pas avoir peur de l'échec et à continuer à persévérer malgré les obstacles.", '2023-01-20 12:21:19'),
+(774, 658, "LunarSphinx", "Cette citation nous rappelle que la réussite n'est pas uniquement basée sur les résultats, mais aussi sur notre processus et notre attitude face à l'échec.", '2023-02-13 21:36:27'),
+(790, 773, "GalacticSailor", "L'échec peut sembler insurmontable, mais cette citation nous rappelle que nous avons le pouvoir de choisir notre réponse à l'échec et de continuer à avancer.", '2023-02-28 09:14:25'),
+(792, 773, "CrimsonCobra", "Cette citation nous encourage à ne pas se laisser décourager par l'échec et à continuer à travailler dur pour atteindre nos objectifs.", '2023-01-19 16:27:53'),
+(796, 773, "CelestialRaven", "J'aime cette citation car elle nous rappelle que l'échec peut être une source de motivation pour continuer à travailler dur et à persévérer.", '2023-01-18 07:03:55'),
+(801, 724, "SilverStallion", "Cette citation nous rappelle que chaque échec est une occasion de grandir et de devenir plus fort en tant que personne.", '2023-01-07 06:12:02'),
+(804, 724, "EnigmaticKraken", "L'échec peut sembler décourageant, mais cette citation nous encourage à ne pas abandonner et à continuer à avancer malgré les difficultés.", '2023-03-03 07:00:48'),
+(810, 940, "MysticMoose", "Cette citation nous rappelle que la persévérance et la détermination sont les clés de la réussite face à l'échec.", '2023-03-25 19:21:27'),
+(837, 940, "FieryFalcon", "J'aime cette citation car elle nous encourage à ne pas avoir peur de l'échec et à continuer à essayer jusqu'à ce que nous atteignions notre but.", '2023-02-28 12:46:12'),
+(870, 940, "OceanicOctopus", "Cette citation nous rappelle que l'échec peut être un enseignement précieux pour nous aider à prendre des décisions plus avisées à l'avenir.", '2023-02-15 17:54:57'),
+(882, 717, "CrimsonCheetah", "L'échec peut sembler décourageant, mais cette citation nous encourage à garder la foi en nous-mêmes et à continuer à travailler dur pour atteindre nos objectifs.", '2023-01-29 10:36:02'),
+(901, 717, "CosmicCactus", "Cette citation nous rappelle que l'échec est un élément naturel de tout processus créatif et qu'il peut être utilisé comme source d'inspiration pour nous aider à innover.", '2023-01-03 08:32:05'),
+(902, 717, "EnchantedElk", "J'aime cette citation car elle nous encourage à ne pas se laisser abattre par l'échec, mais plutôt à le voir comme une occasion de nous améliorer.", '2023-03-30 09:57:21'),
+(907, 743, "RadiantRaccoon", "Cette citation nous rappelle que chaque échec est une occasion de réévaluer nos priorités et de nous concentrer sur ce qui est vraiment important pour nous.", '2023-04-07 18:13:55'),
+(910, 743, "JadeJaguar", "L'échec peut sembler insurmontable, mais cette citation nous rappelle que nous avons la capacité de surmonter nos obstacles et d'atteindre nos objectifs.", '2023-03-14 03:05:23'),
+(940, 743, "StarrySwan", "Cette citation nous encourage à ne pas avoir peur de l'échec et à continuer à travailler dur pour réaliser notre potentiel.", '2023-03-15 12:26:40'),
+(981, 691, "ElectricEagle", "J'aime cette citation car elle nous rappelle que même les échecs les plus douloureux peuvent être surmontés avec le temps et la persévérance.", '2023-03-09 13:53:26'),
 (993, 724, "FieryFox", "J'aime cette citation car elle nous rappelle que même les échecs les plus douloureux peuvent être surmontés avec le temps et la persévérance.", '2023-01-09 19:26:22');

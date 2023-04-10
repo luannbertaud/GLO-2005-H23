@@ -1,14 +1,13 @@
 DROP TABLE IF EXISTS Users;
 
 CREATE TABLE IF NOT EXISTS Users(
-username VARCHAR(255) NOT NULL,
-email VARCHAR(255) NOT NULL,
-first_name VARCHAR(255) NOT NULL,
-last_name VARCHAR(255) NOT NULL,
-bio TEXT,
-PRIMARY KEY(username),
-UNIQUE KEY (email)
-);
+    username VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    first_name VARCHAR(255) NOT NULL,
+    last_name VARCHAR(255) NOT NULL,
+    bio TEXT,
+    PRIMARY KEY(username),
+    UNIQUE KEY (email) );
 
 INSERT INTO Users
 VALUES
@@ -112,5 +111,3 @@ VALUES
 ("EmeraldEagle", "rdlvfecz@ujkby.net", "Benjamin", "Reid", "Des mots pour apporter la joie, des phrases pour inspirer le bonheur."),
 ("MysticMosquito", "jymqxuos@oitcs.org", "Eleanor", "Rivera", "Écrivain en quête de vérité, créateur de pensées profondes."),
 ("ElectricEagleRay", "ujsoyzrp@gvkwl.com", "Michael", "Schmidt", "Citations pour les âmes généreuses et les esprits bienveillants.");
-
-SELECT * FROM Users;
