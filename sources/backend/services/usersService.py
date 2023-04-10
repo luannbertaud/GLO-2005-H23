@@ -1,12 +1,13 @@
 import re
-
-from exceptions.InvalidParameterException import InvalidParameterException
-from exceptions.MissingParameterException import MissingParameterException
+from sources.backend.exceptions.InvalidParameterException import InvalidParameterException
+from sources.backend.exceptions.MissingParameterException import MissingParameterException
+from sources.backend.repositories.userRepository import UserRepository
 
 
 class UsersService:
 
-    def __int__(self, user_repository):
+    def __int__(self, user_repository: UserRepository):
+        print("test")
         self.user_repository = user_repository
 
     def create_user(self, signup_input):
@@ -25,8 +26,8 @@ class UsersService:
         if not re.fullmatch(r'[^@]+@[^@]+\.[^@]+', signup_input['email']):
             raise InvalidParameterException('Invalid email')
 
-        if self.repository.username_exists(signup_input['username']):
+        if self.user_repository.username_exists(signup_input['username']):
             raise InvalidParameterException('Username already exists')
 
-        if self.repository.email_exists(signup_input['email']):
+        if self.user_repository.email_exists(signup_input['email']):
             raise InvalidParameterException('Email already exists')

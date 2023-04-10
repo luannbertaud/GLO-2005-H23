@@ -1,14 +1,14 @@
 from flask import Flask, request
 
 import json
-from repositories.userRepository import UserRepository
-from services.usersService import UsersService
-from services.authService import AuthService
+from sources.backend.repositories.userRepository import UserRepository
+from sources.backend.services.usersService import UsersService
+from sources.backend.services.authService import AuthService
 
 app = Flask(__name__)
 
 user_repository = UserRepository()
-users_service = UsersService(user_repository)
+users_service = UsersService()
 auth_service = AuthService(user_repository)
 
 
