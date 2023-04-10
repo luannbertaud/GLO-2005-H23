@@ -8,7 +8,7 @@ from sources.backend.services.authService import AuthService
 app = Flask(__name__)
 
 user_repository = UserRepository()
-users_service = UsersService()
+users_service = UsersService(user_repository)
 auth_service = AuthService(user_repository)
 
 

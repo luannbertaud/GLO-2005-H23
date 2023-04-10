@@ -7,8 +7,7 @@ from sources.backend.repositories.userRepository import UserRepository
 class UsersService:
 
     def __int__(self, user_repository: UserRepository):
-        print("test")
-        self.user_repository = user_repository
+        self.repository = user_repository
 
     def create_user(self, signup_input):
         self.__verify_signup_input(signup_input)

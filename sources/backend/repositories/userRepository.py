@@ -3,12 +3,13 @@ from uuid import uuid4
 from passlib.hash import sha256_crypt
 import datetime
 
-from exceptions.InvalidParameterException import InvalidParameterException
+from sources.backend.exceptions.InvalidParameterException import InvalidParameterException
 
 
 class UserRepository:
 
     def __int__(self):
+        print("1")
         self.tokens = []
 
     @staticmethod
