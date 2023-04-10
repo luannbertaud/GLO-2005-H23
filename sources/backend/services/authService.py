@@ -1,8 +1,10 @@
+import re
+
 from exceptions.InvalidParameterException import InvalidParameterException
 from exceptions.MissingParameterException import MissingParameterException
 
 
-class Auth:
+class AuthService:
 
     def __init__(self, user_repository):
         self.user_repository = user_repository
@@ -12,10 +14,10 @@ class Auth:
         return self.user_repository.login(login_inputs)
 
     @staticmethod
-    def __verify_login_inputs():
-        if "email" not in user_credential or "password" not in user_credential:
+    def __verify_login_inputs(login_inputs):
+        if "email" not in login_inputs or "password" not in login_inputs:
             raise MissingParameterException('email or password is missing for login')
-        if user_credential['email'] == '' or user_credential['password'] == '':
+        if login_inputs['email'] == '' or login_inputs['password'] == '':
             raise InvalidParameterException('Invalid parameter')
-        if not re.fullmatch(r'[^@]+@[^@]+\.[^@]+', user_credential['email']):
+        if not re.fullmatch(r'[^@]+@[^@]+\.[^@]+', login_inputs['email']):
             raise InvalidParameterException('Invalid email')

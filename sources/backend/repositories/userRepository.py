@@ -1,5 +1,7 @@
 import pymysql
 from uuid import uuid4
+from passlib.hash import sha256_crypt
+import datetime
 
 from exceptions.InvalidParameterException import InvalidParameterException
 
@@ -34,7 +36,7 @@ class UserRepository:
                 username = set.get_username_by_email(email)
                 return {
                     "token_id": str(self.create_token(username)),
-                    "username": public_DTO["username"]
+                    "username": username
                 }
             else:
                 raise InvalidParameterException("email or password invalid")
@@ -59,3 +61,23 @@ class UserRepository:
             return cursor.fetchone()[0]
         finally:
             connection.close()
+
+    def create_user(self, signup_input):
+        connection = self.__create_connection()
+        username = signup_input["username"]
+        email = signup_input['email']
+        first_name = signup_input['first_name']
+        last_name = signup_input['last_name']
+        bio = signup_input['bio']
+        hashed_password = sha256_crypt.hash(signup_input['password'])
+        try:
+            cursor = connection.cursor()
+            request = f"INSERT INTO Users (username, email, first_name, last_name, bio) VALUES ('{username}', " \
+                      f"'{email}', '{first_name}', '{last_name}', '{bio}');"
+            cursor.execute(request)
+            request = f"INSERT INTO Auth (email, password) VALUES ('{email}', '{hashed_password}');"
+            cursor.execute(request)
+            return cursor.lastrowid
+        finally:
+            connection.close()
+
