@@ -1,7 +1,7 @@
 import re
 from sources.backend.exceptions.InvalidParameterException import InvalidParameterException
 from sources.backend.exceptions.MissingParameterException import MissingParameterException
-from sources.backend.repositories.userRepository import UserRepository
+from sources.backend.users import UserRepository
 
 
 class UsersService:

@@ -4,7 +4,7 @@ from sources.backend.exceptions.InvalidParameterException import InvalidParamete
 from sources.backend.exceptions.MissingParameterException import MissingParameterException
 
 
-class AuthService:
+class Auth:
 
     def __init__(self, user_repository):
         self.user_repository = user_repository

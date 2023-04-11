@@ -1,15 +1,13 @@
 from flask import Flask, request
 
 import json
-from sources.backend.repositories.userRepository import UserRepository
-from sources.backend.services.usersService import UsersService
-from sources.backend.services.authService import AuthService
+from sources.backend.users import Users
+from sources.backend.auth import Auth
 
 app = Flask(__name__)
 
-user_repository = UserRepository()
-users_service = UsersService(user_repository)
-auth_service = AuthService(user_repository)
+user = Users()
+auth = Auth()
 
 
 @app.route('/')
@@ -19,13 +17,13 @@ def heartbeat():
 
 @app.route('/login', methods=['POST'])
 def login():
-    token = auth_service.login(request.get_json())
+    token = auth.login(request.get_json())
     return json.dumps(token), 200
 
 
 @app.route('/signup', methods=['POST'])
 def signup():
-    result = users_service.create_user(request.get_json())
+    result = user.create_user(request.get_json())
     return json.dumps({"userId": result}), 201
 
 
