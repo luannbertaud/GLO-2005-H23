@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useCookies } from "react-cookie";
 
 export async function ValidateAccess(router: any, cookieValue: string) {
-    await new Promise(r => setTimeout(r, 2000));
+    await new Promise(r => setTimeout(r, 500));
     if (cookieValue !== "a")
         router.push("/authentification");
 }
