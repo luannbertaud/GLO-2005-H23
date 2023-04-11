@@ -2,11 +2,12 @@ import re
 
 from sources.backend.exceptions.InvalidParameterException import InvalidParameterException
 from sources.backend.exceptions.MissingParameterException import MissingParameterException
+from sources.backend.repositories.usersRepository import UsersRepository
 
 
-class Auth:
+class AuthService:
 
-    def __init__(self, user_repository):
+    def __init__(self, user_repository: UsersRepository):
         self.user_repository = user_repository
 
     def login(self, login_inputs):

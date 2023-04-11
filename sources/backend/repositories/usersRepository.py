@@ -4,11 +4,11 @@ from passlib.hash import sha256_crypt
 import datetime
 
 from sources.backend.exceptions.InvalidParameterException import InvalidParameterException
-from sources.backend.exceptions.MissingParameterException import MissingParameterException
 
-class Users:
 
-    def __int__(self):
+class UsersRepository:
+
+    def __init__(self):
         print("1")
         self.tokens = []
 
@@ -28,13 +28,13 @@ class Users:
         password = login_inputs["password"]
         try:
             cursor = connection.cursor()
-            request = f"SELECT password FROM auth WHERE email = '{email}';"
+            request = f"SELECT password FROM Authentication WHERE email = '{email}';"
             cursor.execute(request)
             hashed_password = cursor.fetchone()[0]
             if hashed_password is None:
                 raise InvalidParameterException("email invalid")
             if sha256_crypt.verify(password, hashed_password):
-                username = set.get_username_by_email(email)
+                username = self.get_username_by_email(email)
                 return {
                     "token_id": str(self.create_token(username)),
                     "username": username
@@ -64,7 +64,6 @@ class Users:
             connection.close()
 
     def create_user(self, signup_input):
-        self.__verify_signup_input(signup_input)
         connection = self.__create_connection()
         username = signup_input["username"]
         email = signup_input['email']
@@ -77,26 +76,31 @@ class Users:
             request = f"INSERT INTO Users (username, email, first_name, last_name, bio) VALUES ('{username}', " \
                       f"'{email}', '{first_name}', '{last_name}', '{bio}');"
             cursor.execute(request)
-            request = f"INSERT INTO Auth (email, password) VALUES ('{email}', '{hashed_password}');"
+            request = f"INSERT INTO Authentication (email, password) VALUES ('{email}', '{hashed_password}');"
             cursor.execute(request)
-            return cursor.lastrowid
+            return {
+                "token_id": str(self.create_token(username)),
+                "username": username
+            }
         finally:
             connection.close()
 
-    def __verify_signup_input(self, signup_input):
-        if 'email' not in signup_input or 'username' not in signup_input or 'first_name' not in signup_input \
-                or 'last_name' not in signup_input or 'bio' not in signup_input or 'password' not in signup_input:
-            raise MissingParameterException('One or more parameters are missing')
+    def is_username_already_exists(self, username):
+        connection = self.__create_connection()
+        try:
+            cursor = connection.cursor()
+            request = f"SELECT * FROM Users WHERE username = '{username}';"
+            cursor.execute(request)
+            return cursor.fetchone() is not None
+        finally:
+            connection.close()
 
-        if signup_input['email'] == '' or signup_input['username'] == '' or signup_input['first_name'] == '' \
-                or signup_input['last_name'] == '' or signup_input['bio'] == '' or signup_input['password'] == '':
-            raise InvalidParameterException('Invalid parameter')
-
-        if not re.fullmatch(r'[^@]+@[^@]+\.[^@]+', signup_input['email']):
-            raise InvalidParameterException('Invalid email')
-
-        if self.user_repository.username_exists(signup_input['username']):
-            raise InvalidParameterException('Username already exists')
-
-        if self.user_repository.email_exists(signup_input['email']):
-            raise InvalidParameterException('Email already exists')
+    def is_email_already_exists(self, email):
+        connection = self.__create_connection()
+        try:
+            cursor = connection.cursor()
+            request = f"SELECT * FROM Users WHERE email = '{email}';"
+            cursor.execute(request)
+            return cursor.fetchone() is not None
+        finally:
+            connection.close()
