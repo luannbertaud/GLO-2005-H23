@@ -32,3 +32,8 @@ class AuthService:
         if token_id is None:
             raise MissingParameterException("token_id is missing")
         self.user_repository.logout(token_id)
+
+    def get_user_by_token(self, token_id):
+        if token_id is None:
+            raise MissingParameterException("token_id is missing")
+        return self.user_repository.get_user_by_token(token_id)

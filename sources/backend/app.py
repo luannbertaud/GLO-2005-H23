@@ -3,13 +3,18 @@ import json
 from flask import Flask, request
 
 from sources.backend.repositories.usersRepository import UsersRepository
+from sources.backend.repositories.likesRepository import LikesRepository
 from sources.backend.services.authService import AuthService
 from sources.backend.services.usersService import UsersService
+from sources.backend.services.likesService import LikesService
 
 app = Flask(__name__)
 
 user_repository = UsersRepository()
+like_repository = LikesRepository(user_repository)
 user_service = UsersService(user_repository)
+like_service = LikesService(user_repository, like_repository)
+
 auth_service = AuthService(user_repository)
 
 
@@ -51,6 +56,17 @@ def verify_token():
         return 'Invalid token', 401
     else:
         return 'Valid token', 200
+
+
+@app.route('/like', methods=['POST', 'DELETE'])
+def like():
+    if auth_service.check_if_token_is_valid(request.headers.get("X-token-id")) is False:
+        return 'Invalid token', 401
+    if request.method == 'POST':
+        like_service.like(request.headers.get("X-token-id"), request.get_json())
+        return "like successful", 200
+    else:
+        return 'Method not allowed', 405
 
 
 if __name__ == '__main__':
