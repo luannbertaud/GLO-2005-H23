@@ -2,12 +2,12 @@ DROP TABLE IF EXISTS Likes;
 
 CREATE TABLE IF NOT EXISTS Likes(
 id INT AUTO_INCREMENT,
-post INT NOT NULL,
-sender VARCHAR(255) NOT NULL,
+post_id INT NOT NULL,
+author VARCHAR(255) NOT NULL,
 timestamp DATETIME NOT NULL,
 PRIMARY KEY (id),
-FOREIGN KEY (post) REFERENCES Posts(id) ON DELETE CASCADE,
-FOREIGN KEY (sender) REFERENCES Users(username) ON UPDATE CASCADE ON DELETE CASCADE
+FOREIGN KEY (post_id) REFERENCES Posts(id) ON DELETE CASCADE,
+FOREIGN KEY (author) REFERENCES Users(username) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 DELIMITER //
@@ -19,7 +19,7 @@ CREATE TRIGGER CreateLikeNotification
 		END; //
 DELIMITER ;
 
-INSERT INTO Likes (id, post, sender, timestamp)
+INSERT INTO Likes (id, post_id, author, timestamp)
 VALUES
 (8, 981, "CosmicCougar",'2023-02-01 04:09:06'),
 (15, 940, "SapphireSparrow",'2023-04-05 07:21:39'),

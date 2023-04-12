@@ -2,8 +2,8 @@ DROP TABLE IF EXISTS Comments;
 
 CREATE TABLE IF NOT EXISTS Comments(
 id INT AUTO_INCREMENT,
-post INT NOT NULL,
-sender VARCHAR(255) NOT NULL,
+post_id INT NOT NULL,
+author VARCHAR(255) NOT NULL,
 body TEXT NOT NULL,
 timestamp DATETIME NOT NULL,
 PRIMARY KEY (id),
@@ -20,7 +20,7 @@ CREATE TRIGGER CreateCommentNotification
 		END; //
 DELIMITER ;
 
-INSERT INTO Comments (id, post, sender, body, timestamp)
+INSERT INTO Comments (id, post_id, author, body, timestamp)
 VALUES
 (159, 92, "EmeraldDragonfly", "Cette citation d'Albert Einstein est un rappel important que l'échec est souvent une étape nécessaire sur le chemin de l'innovation.", '2023-01-03 00:31:47'),
 (119, 159, "BlissfulGnome","J'aime cette citation parce qu'elle montre que le succès ne vient pas toujours facilement, mais qu'il est souvent précédé de nombreux échecs.", '2023-02-23 19:47:07'),
