@@ -22,3 +22,13 @@ class AuthService:
             raise InvalidParameterException('Invalid parameter')
         if not re.fullmatch(r'[^@]+@[^@]+\.[^@]+', login_inputs['email']):
             raise InvalidParameterException('Invalid email')
+    
+    def is_token_valid(self, token_id):
+        if token_id == "":
+            raise InvalidParameterException("token_id is empty")
+        return self.user_repository.is_token_valid(token_id)
+
+    def logout(self, token_id):
+        if token_id is None:
+            raise MissingParameterException("token_id is missing")
+        self.user_repository.logout(token_id)

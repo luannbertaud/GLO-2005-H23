@@ -26,8 +26,31 @@ def login():
 
 @app.route('/signup', methods=['POST'])
 def signup():
-    result = user_service.create_user(request.get_json())
-    return json.dumps({"userId": result}), 201
+    token = user_service.create_user(request.get_json())
+    return json.dumps(token), 201
+
+
+@app.route('/logout', methods=['POST'])
+def logout():
+    auth_service.logout(request.headers.get("X-token-id"))
+    return 'Logout successful', 200
+
+
+@app.route('/profil/<string:username>', methods=['GET'])
+def get_user_profil(username):
+    if auth_service.is_token_valid(request.headers.get("X-token-id")) is False:
+        return 'Invalid token', 401
+    else:
+        response = user_repository.get_user_profil_data(username)
+    return json.dumps(response), 200
+
+
+@app.route('/verify_token', methods=['GET'])
+def verify_token():
+    if auth_service.is_token_valid(request.headers.get("X-token-id")) is False:
+        return 'Invalid token', 401
+    else:
+        return 'Valid token', 200
 
 
 if __name__ == '__main__':

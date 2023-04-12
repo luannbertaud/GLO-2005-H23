@@ -1,5 +1,5 @@
 import pymysql
-from uuid import uuid4
+from uuid import uuid4, UUID
 from passlib.hash import sha256_crypt
 import datetime
 
@@ -104,3 +104,26 @@ class UsersRepository:
             return cursor.fetchone() is not None
         finally:
             connection.close()
+
+    def is_token_valid(self, token_id):
+        token_is_valid = False
+        for stocked_token in self.tokens:
+            if stocked_token["token_expire_time"] < datetime.datetime.now():
+                self.tokens.remove(stocked_token)
+                continue
+            if stocked_token["token_id"] == UUID(token_id):
+                token_index = self.tokens.index(stocked_token)
+                self.update_token(token_index)
+                token_is_valid = True
+        return token_is_valid
+
+    def logout(self, token_id):
+        for stocked_token in self.tokens:
+            if stocked_token["token_id"] == token_id:
+                self.tokens.remove(stocked_token)
+                break
+
+
+
+
+        
