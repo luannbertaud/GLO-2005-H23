@@ -1,19 +1,24 @@
 "use client";
 
 import React from "react";
+import { GrantAccess } from "@/components/Access";
+import {useRouter} from "next/navigation";
+import {useCookies} from "react-cookie";
 
 export default function Auth() {
     const [signup, setSignup] = React.useState(false);
     const [loading, setLoading] = React.useState(false);
+    const router = useRouter();
+    const [_, setCookie]: [any, any, any] = useCookies(['user']);
 
     async function handleSubmit(event : any) {
         event.preventDefault();
         setLoading(true);
-        setTimeout(() => {
-            console.log(event.target.email.value + "   " + event.target.password.value);
-            setLoading(false);
-        }, 3000);
+        console.log(event.target.email.value + "   " + event.target.password.value);
+        await GrantAccess(setCookie, router, "a");
+        setLoading(false);
     }
+
 
     async function toggleSignup() {
         let elements : string[] = ["firstname", "firstname-l", "lastname", "lastname-l", "username", "username-l", "bio", "bio-l"];
