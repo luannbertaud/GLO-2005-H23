@@ -117,9 +117,12 @@ class UsersRepository:
                 token_is_valid = True
         return token_is_valid
 
+    def update_token(self, token_index):
+        self.tokens[token_index]["token_expire_time"] = datetime.datetime.now() + datetime.timedelta(days=1)
+
     def logout(self, token_id):
         for stocked_token in self.tokens:
-            if stocked_token["token_id"] == token_id:
+            if stocked_token["token_id"] == UUID(token_id):
                 self.tokens.remove(stocked_token)
                 break
 
