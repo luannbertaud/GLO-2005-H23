@@ -39,12 +39,13 @@ export default function NavBar() {
                     <img src={"/search.png"} className={"w-5 text-gray-400"} alt={""}/>
                 </button>
             </div>
-            <button className={`w-fit h-11 rounded-full border-2 p-2 px-4 inline-flex items-center justify-center gap-2`}>
+            <button className={`w-fit h-11 rounded-full border-2 p-2 px-4 inline-flex items-center justify-center gap-2 hover:bg-gray-100 active:bg-gray-200`}>
                 <img src={"/write.svg"} className={"w-4 text-gray-400"} alt={""}/>
                 New Post
             </button>
-            <button className={`w-fit h-11 rounded-full border-2 p-2 px-2 inline-flex items-center justify-center`}>
+            <button className={`w-fit h-11 rounded-full border-2 p-2 px-2 inline-flex items-center justify-center relative hover:bg-gray-100 active:bg-gray-200`}>
                 <img src={"/notification.png"} className={"w-6 opacity-80"} alt={""}/>
+                <span className="top-0 left-7 absolute  w-3.5 h-3.5 bg-red-500 border-2 border-white rounded-full"></span>
             </button>
             <button className={"bg-gray-800 rounded-full w-12 h-12 text-white justify-center flex items-center font-bold text-[110%] relative"} onClick={() => toggleMenu(undefined)}>
                 U
