@@ -1,42 +1,15 @@
 'use client';
 
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import Comment from "@/components/Comment";
 import NewComment from "@/components/NewComment";
 import {secondsToRelative} from "@/components/TimeParsing";
-import Loading from "@/app/loading";
-
-async function loadCitationCard(id :string) {
-    await new Promise(r => setTimeout(r, 200));
-    // let res = await fetch("");
-    let post = {
-        "author": "Tom",
-        "body": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
-        "timestamp": 983646381,
-        "police": "",
-        "likes": 108,
-        "userLike": false,
-        "comments": [
-            1, 2, 3, 4
-        ]
-    };
-    return {...post, "timestamp": secondsToRelative(post.timestamp)};
-}
 
 export default function CitationCard({ body } : any) {
     const [userLiked, setUserLiked] = React.useState(false);
     const [commentsOpened, setCommentsOpened] = React.useState(false);
     const [card, setCard] : [any, any] = useState(body);
     const commentsContainerRef = React.createRef<HTMLDivElement>();
-
-    // useEffect(() => {
-    //     if (card === undefined)
-    //         loadCitationCard(id).then((c) => {
-    //             setUserLiked(c.userLike);
-    //             setCard(c);
-    //         });
-    // })
-    // if (card === undefined) return <Loading/>;
 
     async function userLike() {
         await new Promise(r => setTimeout(r, 500));
@@ -92,11 +65,11 @@ export default function CitationCard({ body } : any) {
                 <p className={"inline-flex items-center justify-end text-gray-500"}>{secondsToRelative(card.timestamp)}</p>
                 <div ref={commentsContainerRef} className={"scrollbar-hidden col-span-3 transition-all duration-700 max-h-0 overflow-hidden opacity-0 grid gap-5 overflow-y-scroll border-t-2"}>
                     <NewComment newCommentCallback={userComment}/>
-                     {/*{*/}
-                     {/*    card.comments.map((cId : any, index : number)=> {*/}
-                     {/*       return <Comment id={cId} key={index}/>*/}
-                     {/*   })*/}
-                     {/*}*/}
+                     {
+                         card.comments.map((c : any, index : number)=> {
+                            return <Comment body={c} key={index}/>
+                        })
+                     }
                 </div>
             </div>
         </div>

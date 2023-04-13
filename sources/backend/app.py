@@ -4,7 +4,7 @@ from flask import Flask, request
 from flask_cors import CORS
 from asgiref.wsgi import WsgiToAsgi
 
-
+from repositories.commentsRepository import CommentsRepository
 from repositories.usersRepository import UsersRepository
 from repositories.likesRepository import LikesRepository
 from repositories.postsRepository import PostsRepository
@@ -20,9 +20,10 @@ asgi_app = WsgiToAsgi(app)
 user_repository = UsersRepository()
 like_repository = LikesRepository(user_repository)
 posts_repository = PostsRepository(user_repository)
+comments_repository = CommentsRepository(user_repository)
 user_service = UsersService(user_repository)
 like_service = LikesService(user_repository, like_repository)
-posts_service = PostsService(user_repository, posts_repository)
+posts_service = PostsService(user_repository, posts_repository, comments_repository)
 
 auth_service = AuthService(user_repository)
 
