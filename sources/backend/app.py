@@ -60,11 +60,12 @@ def verify_token():
 
 @app.route('/like', methods=['POST', 'DELETE'])
 def like():
-    if auth_service.check_if_token_is_valid(request.headers.get("X-token-id")) is False:
+    if auth_service.is_token_valid(request.headers.get("X-token-id")) is False:
         return 'Invalid token', 401
     if request.method == 'POST':
-        like_service.like(request.headers.get("X-token-id"), request.get_json())
-        return "like successful", 200
+        return like_service.like(request.headers.get("X-token-id"), request.get_json())
+    elif request.method == 'DELETE':
+        return like_service.unlike(request.headers.get("X-token-id"), request.get_json())
     else:
         return 'Method not allowed', 405
 
