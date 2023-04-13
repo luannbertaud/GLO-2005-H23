@@ -2,15 +2,15 @@ DROP TABLE IF EXISTS Posts;
 
 CREATE TABLE IF NOT EXISTS Posts(
 id INT AUTO_INCREMENT,
-owner VARCHAR(255) NOT NULL,
+author VARCHAR(255) NOT NULL,
 body TEXT NOT NULL,
 police VARCHAR(255) NOT NULL,
 timestamp DATETIME NOT NULL,
 PRIMARY KEY(id),
-FOREIGN KEY(owner) REFERENCES Users(username) ON UPDATE CASCADE ON DELETE CASCADE
+FOREIGN KEY(author) REFERENCES Users(username) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
-INSERT INTO Posts (id, owner, body, police, timestamp)
+INSERT INTO Posts (id, author, body, police, timestamp)
 VALUES
 (314, "BlissfulGnome", "Le bonheur, c'est de continuer à désirer ce que l'on possède.", "Arial", '2023-02-28 16:22:08'),
 (540, "SapphireJazz", "La vie, c'est comme une bicyclette, il faut avancer pour ne pas perdre l'équilibre.", "Times New Roman", '2023-02-08 14:17:15'),
