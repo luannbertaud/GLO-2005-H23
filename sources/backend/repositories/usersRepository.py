@@ -9,7 +9,6 @@ from exceptions.InvalidParameterException import InvalidParameterException
 class UsersRepository:
 
     def __init__(self):
-        print("1")
         self.tokens = []
 
     @staticmethod

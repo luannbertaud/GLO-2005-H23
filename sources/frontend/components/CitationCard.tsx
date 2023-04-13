@@ -23,35 +23,35 @@ async function loadCitationCard(id :string) {
     return {...post, "timestamp": secondsToRelative(post.timestamp)};
 }
 
-export default function CitationCard({ id } : any) {
+export default function CitationCard({ body } : any) {
     const [userLiked, setUserLiked] = React.useState(false);
     const [commentsOpened, setCommentsOpened] = React.useState(false);
-    const [card, setCard] : [any, any] = useState(undefined);
+    const [card, setCard] : [any, any] = useState(body);
     const commentsContainerRef = React.createRef<HTMLDivElement>();
 
-    useEffect(() => {
-        if (card === undefined)
-            loadCitationCard(id).then((c) => {
-                setUserLiked(c.userLike);
-                setCard(c);
-            });
-    })
-    if (card === undefined) return <Loading/>;
+    // useEffect(() => {
+    //     if (card === undefined)
+    //         loadCitationCard(id).then((c) => {
+    //             setUserLiked(c.userLike);
+    //             setCard(c);
+    //         });
+    // })
+    // if (card === undefined) return <Loading/>;
 
     async function userLike() {
         await new Promise(r => setTimeout(r, 500));
         setUserLiked(true);
-        loadCitationCard(id).then((c) => {
-            setCard({...c, "likes": c.likes+1});
-        });
+        // loadCitationCard(id).then((c) => {
+        //     setCard({...c, "likes": c.likes+1});
+        // });
     }
 
     async function userComment(content : string) {
         console.log(content)
         await new Promise(r => setTimeout(r, 500));
-        loadCitationCard(id).then((c) => {
-            setCard({...c, "comments": [...c.comments, 8]});
-        });
+        // loadCitationCard(id).then((c) => {
+        //     setCard({...c, "comments": [...c.comments, 8]});
+        // });
     }
 
     async function toggleComments() {
@@ -89,14 +89,14 @@ export default function CitationCard({ id } : any) {
                     <img src={"/down-arrow.svg"} className={`${commentsOpened ? "scale-y-[-1]" : ""} w-4 text-gray-400`} alt={""}/>
                     Comments
                 </button>
-                <p className={"inline-flex items-center justify-end text-gray-500"}>{card.timestamp}</p>
+                <p className={"inline-flex items-center justify-end text-gray-500"}>{secondsToRelative(card.timestamp)}</p>
                 <div ref={commentsContainerRef} className={"scrollbar-hidden col-span-3 transition-all duration-700 max-h-0 overflow-hidden opacity-0 grid gap-5 overflow-y-scroll border-t-2"}>
                     <NewComment newCommentCallback={userComment}/>
-                     {
-                         card.comments.map((cId : any, index : number)=> {
-                            return <Comment id={cId} key={index}/>
-                        })
-                     }
+                     {/*{*/}
+                     {/*    card.comments.map((cId : any, index : number)=> {*/}
+                     {/*       return <Comment id={cId} key={index}/>*/}
+                     {/*   })*/}
+                     {/*}*/}
                 </div>
             </div>
         </div>

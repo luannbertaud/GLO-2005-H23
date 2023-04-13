@@ -7,7 +7,9 @@ from asgiref.wsgi import WsgiToAsgi
 
 from repositories.usersRepository import UsersRepository
 from repositories.likesRepository import LikesRepository
+from repositories.postsRepository import PostsRepository
 from services.authService import AuthService
+from services.postsService import PostsService
 from services.usersService import UsersService
 from services.likesService import LikesService
 
@@ -17,8 +19,10 @@ asgi_app = WsgiToAsgi(app)
 
 user_repository = UsersRepository()
 like_repository = LikesRepository(user_repository)
+posts_repository = PostsRepository(user_repository)
 user_service = UsersService(user_repository)
 like_service = LikesService(user_repository, like_repository)
+posts_service = PostsService(user_repository, posts_repository)
 
 auth_service = AuthService(user_repository)
 
@@ -72,6 +76,14 @@ def like():
         return "like successful", 200
     else:
         return 'Method not allowed', 405
+
+
+@app.route('/posts', methods=['GET'])
+def latest_posts():
+    if auth_service.is_token_valid(request.headers.get("X-token-id")) is False:
+        return 'Invalid token', 401
+    res = posts_service.get_latest_posts(request.headers.get("X-token-id"), 0, 10)
+    return json.dumps(res), 200
 
 
 if __name__ == '__main__':
