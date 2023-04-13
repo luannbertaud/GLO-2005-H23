@@ -14,9 +14,41 @@ export default function Auth() {
     async function handleSubmit(event : any) {
         event.preventDefault();
         setLoading(true);
-        console.log(event.target.email.value + "   " + event.target.password.value);
-        await GrantAccess(setCookie, router, "a");
-        setLoading(false);
+
+        let endpoint = signup ? "signup" : "login";
+        let body: any = {
+              "email": event.target.email.value,
+              "password": event.target.password.value,
+        };
+        if (signup) {
+            body = {
+                ...body,
+              "username": event.target.username.value,
+              "first_name": event.target.firstname.value,
+              "last_name": event.target.lastname.value,
+              "bio": event.target.bio.value,
+            };
+        }
+
+        let res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/${endpoint}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(body),
+        });
+
+        if (res.ok) {
+            await res.json().then(j => {
+                GrantAccess(setCookie, router, encodeURIComponent(JSON.stringify(j)));
+                setLoading(false);
+            })
+        } else {
+            await res.json().then(j => {
+                alert(j.desc);
+                setLoading(false);
+            })
+        }
     }
 
 

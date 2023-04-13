@@ -17,8 +17,8 @@ class UsersRepository:
         return pymysql.connect(
             host="localhost",
             user="root",
-            password="@Riane24",
-            db="GLO_2005_H23",
+            password="password",
+            db="instapaper",
             autocommit=True
         )
 
@@ -30,9 +30,10 @@ class UsersRepository:
             cursor = connection.cursor()
             request = f"SELECT password FROM Authentication WHERE email = '{email}';"
             cursor.execute(request)
-            hashed_password = cursor.fetchone()[0]
-            if hashed_password is None:
+            entry = cursor.fetchone()
+            if entry is None:
                 raise InvalidParameterException("email invalid")
+            hashed_password = entry[0]
             if sha256_crypt.verify(password, hashed_password):
                 username = self.get_username_by_email(email)
                 return {

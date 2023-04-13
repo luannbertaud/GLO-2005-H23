@@ -1,7 +1,9 @@
 import json
 
 from flask import Flask, request
+from flask_cors import CORS
 from asgiref.wsgi import WsgiToAsgi
+
 
 from repositories.usersRepository import UsersRepository
 from repositories.likesRepository import LikesRepository
@@ -10,6 +12,7 @@ from services.usersService import UsersService
 from services.likesService import LikesService
 
 app = Flask(__name__)
+CORS(app)
 asgi_app = WsgiToAsgi(app)
 
 user_repository = UsersRepository()
