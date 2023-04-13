@@ -132,5 +132,15 @@ class UsersRepository:
                 return stocked_token["username"]
         return None
 
-
-        
+    def search_user(self, query: str):
+        connection = self.__create_connection()
+        users = []
+        try:
+            cursor = connection.cursor()
+            request = f"SELECT * FROM Users WHERE username LIKE '%{query}%' OR email LIKE '%{query}%@%';"
+            cursor.execute(request)
+            columns = [key[0] for key in cursor.description]
+            users = [dict(zip(columns, user)) for user in cursor.fetchall()]
+        finally:
+            connection.close()
+        return users

@@ -87,6 +87,15 @@ def like():
         return 'Method not allowed', 405
 
 
+@app.route('/search/<string:query>', methods=['GET'])
+def search_user(query: str):
+    if auth_service.is_token_valid(request.headers.get("X-token-id")) is False:
+        return 'Invalid token', 401
+    else:
+        response = user_repository.search_user(query)
+    return json.dumps(response), 200
+
+
 # ----- Posts -----
 
 
