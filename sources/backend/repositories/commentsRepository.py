@@ -54,3 +54,19 @@ class CommentsRepository:
         finally:
             connection.close()
         return comment
+
+    def create_comment(self, post_id, author, body, timestamp):
+        connection = self.__create_connection()
+        new_id = None
+        affected_columns = 0
+        try:
+            cursor = connection.cursor()
+            request = f"INSERT INTO Comments(post_id, author, body, timestamp)" \
+                      f"VALUES ({post_id}, '{author}', '{body}', '{timestamp}');"
+            affected_columns = cursor.execute(request)
+            new_id = cursor.lastrowid
+        except pymysql.err.IntegrityError:
+            new_id = -1
+        finally:
+            connection.close()
+        return affected_columns != 0, new_id

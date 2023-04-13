@@ -124,5 +124,12 @@ def delete_comment(comment_id: int):
     return comments_service.delete(request.headers.get("X-token-id"), comment_id)
 
 
+@app.route('/comments', methods=['POST'])
+def create_comment():
+    if auth_service.is_token_valid(request.headers.get("X-token-id")) is False:
+        return 'Invalid token', 401
+    return comments_service.create(request.headers.get("X-token-id"), request.get_json())
+
+
 if __name__ == '__main__':
     app.run()
