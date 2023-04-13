@@ -13,8 +13,8 @@ class LikesRepository:
         return pymysql.connect(
             host="localhost",
             user="root",
-            password="@Riane24",
-            db="GLO_2005_H23",
+            password="password",
+            db="instapaper",
             autocommit=True
         )
 
