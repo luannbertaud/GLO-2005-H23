@@ -47,7 +47,7 @@ export default function NavBar() {
                 <img src={"/notification.png"} className={"w-6 opacity-80"} alt={""}/>
             </button>
             <button className={"bg-gray-800 rounded-full w-12 h-12 text-white justify-center flex items-center font-bold text-[110%] relative"} onClick={() => toggleMenu(undefined)}>
-                U
+                <img src={"/profile.png"} className={"w-6"} alt={""}/>
             </button>
             <div id="menu" className={"absolute w-fit h-fit top-full right-0 text-gray-500 mr-5 mt-2 grid grid-cols-1 gap-1 max-h-0 transition-all duration-500 overflow-hidden"}>
                 <button className={"text-[180%]"} onClick={() => {toggleMenu(false); router.push("/profile")}}>

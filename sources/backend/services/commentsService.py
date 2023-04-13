@@ -1,6 +1,7 @@
 from datetime import datetime
 import time
 
+from exceptions.InvalidParameterException import InvalidParameterException
 from exceptions.MissingParameterException import MissingParameterException
 from repositories.commentsRepository import CommentsRepository
 from repositories.usersRepository import UsersRepository
@@ -28,13 +29,13 @@ class CommentsService:
             raise MissingParameterException("token_id is missing")
         user = self.user_repository.get_user_by_token(token_id)
         if user is None or body["post_id"] is None or body["body"] is None:
-            return 'Missing values', 400
+            raise MissingParameterException("Missing parameters in [post_id, body]")
         else:
             (success, new_id) = self.comments_repository.create_comment(
                 body["post_id"], user, body["body"], datetime.now().strftime("%Y-%m-%d %H-%M-%S"))
-            if success:
-                return self.get_comment_by_id(new_id), 200
-            return 'Failed to create comment', 500
+            if not success:
+                raise InvalidParameterException("Failed to create comment with provided parameters")
+            return self.get_comment_by_id(new_id)
 
     def get_comment_by_id(self, comment_id):
         com = self.comments_repository.get_comment_by_id(comment_id)

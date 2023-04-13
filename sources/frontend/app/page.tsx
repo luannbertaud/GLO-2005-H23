@@ -18,10 +18,9 @@ export default function Feed() {
         fetch(`${process.env.NEXT_PUBLIC_API_HOST}/posts`, {
               method: 'GET',
               headers: {
-                'X-token-id': JSON.parse(decodeURIComponent(cookies["ipaper_user_token"])).token_id,
+                'X-token-id': JSON.parse(Buffer.from(cookies["ipaper_user_token"], 'base64').toString('ascii')).token_id,
               },
         }).then(r => r.json().then(j => {
-            console.log(j);
             setPosts(j);
             setLoading(false)
         })).catch(e => {

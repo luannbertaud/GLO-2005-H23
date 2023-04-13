@@ -4,11 +4,14 @@ import React, {useState} from "react";
 import Comment from "@/components/Comment";
 import NewComment from "@/components/NewComment";
 import {secondsToRelative} from "@/components/TimeParsing";
+import {GrantAccess} from "@/components/Access";
+import {useCookies} from "react-cookie";
 
 export default function CitationCard({ body } : any) {
     const [userLiked, setUserLiked] = React.useState(false);
     const [commentsOpened, setCommentsOpened] = React.useState(false);
     const [card, setCard] : [any, any] = useState(body);
+    const [cookies]: [any, any, any] = useCookies(['user']);
     const commentsContainerRef = React.createRef<HTMLDivElement>();
 
     async function userLike() {
@@ -20,11 +23,31 @@ export default function CitationCard({ body } : any) {
     }
 
     async function userComment(content : string) {
-        console.log(content)
-        await new Promise(r => setTimeout(r, 500));
-        // loadCitationCard(id).then((c) => {
-        //     setCard({...c, "comments": [...c.comments, 8]});
-        // });
+        let res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/comments`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-token-id': JSON.parse(Buffer.from(cookies["ipaper_user_token"], 'base64').toString('ascii')).token_id,
+          },
+          body: JSON.stringify({
+              "body": content,
+              "post_id": card.id,
+          }),
+        });
+
+        if (res.ok) {
+            await res.json().then(j => {
+                let new_card = {
+                    ...card,
+                    "comments": [j, ...card.comments]
+                };
+                setCard(new_card);
+            })
+        } else {
+            await res.json().then(j => {
+                alert(j.desc);
+            })
+        }
     }
 
     async function toggleComments() {
@@ -66,8 +89,8 @@ export default function CitationCard({ body } : any) {
                 <div ref={commentsContainerRef} className={"scrollbar-hidden col-span-3 transition-all duration-700 max-h-0 overflow-hidden opacity-0 grid gap-5 overflow-y-scroll border-t-2"}>
                     <NewComment newCommentCallback={userComment}/>
                      {
-                         card.comments.map((c : any, index : number)=> {
-                            return <Comment body={c} key={index}/>
+                         card.comments.map((c : any)=> {
+                            return <Comment body={c} key={c.id}/>
                         })
                      }
                 </div>

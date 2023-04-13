@@ -22,7 +22,7 @@ class CommentsRepository:
         connection = self.__create_connection()
         try:
             cursor = connection.cursor()
-            request = f"SELECT * FROM Comments AS c WHERE c.post_id = {post_id};"
+            request = f"SELECT * FROM Comments AS c WHERE c.post_id = {post_id} ORDER BY c.timestamp DESC;"
             cursor.execute(request)
             columns = [key[0] for key in cursor.description]
             comments = [dict(zip(columns, com)) for com in cursor.fetchall()]

@@ -8,7 +8,7 @@ export async function ValidateAccess(router: any, cookieValue: string) {
 
     let token_id = undefined;
     try {
-        token_id = JSON.parse(decodeURIComponent(cookieValue)).token_id
+        token_id = JSON.parse(Buffer.from(cookieValue, 'base64').toString('ascii')).token_id
     } catch (SyntaxError) {
         await router.push("/authentification");
     }
@@ -28,7 +28,7 @@ export async function RemoveAccess(remover: any, router: any, cookieValue : stri
     await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/logout`, {
           method: 'POST',
           headers: {
-            'X-token-id': JSON.parse(decodeURIComponent(cookieValue)).token_id,
+            'X-token-id': JSON.parse(Buffer.from(cookieValue, 'base64').toString('ascii')).token_id,
           },
     });
 

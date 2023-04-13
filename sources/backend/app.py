@@ -128,7 +128,7 @@ def delete_comment(comment_id: int):
 def create_comment():
     if auth_service.is_token_valid(request.headers.get("X-token-id")) is False:
         return 'Invalid token', 401
-    return comments_service.create(request.headers.get("X-token-id"), request.get_json())
+    return comments_service.create(request.headers.get("X-token-id"), request.get_json()), 200
 
 
 if __name__ == '__main__':

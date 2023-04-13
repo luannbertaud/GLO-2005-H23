@@ -4,6 +4,7 @@ import React from "react";
 import { GrantAccess } from "@/components/Access";
 import {useRouter} from "next/navigation";
 import {useCookies} from "react-cookie";
+import {btoa} from "buffer";
 
 export default function Auth() {
     const [signup, setSignup] = React.useState(false);
@@ -37,10 +38,9 @@ export default function Auth() {
           },
           body: JSON.stringify(body),
         });
-
         if (res.ok) {
             await res.json().then(j => {
-                GrantAccess(setCookie, router, encodeURIComponent(JSON.stringify(j)));
+                GrantAccess(setCookie, router, Buffer.from(JSON.stringify(j)).toString('base64'));
                 setLoading(false);
             })
         } else {
