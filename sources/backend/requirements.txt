@@ -42,3 +42,4 @@ Werkzeug==2.2.3
 build==0.10.0
 pyproject_hooks==1.0.0
 uvicorn==0.21.1
+asgiref==3.6.0
