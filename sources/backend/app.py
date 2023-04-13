@@ -18,16 +18,16 @@ app = Flask(__name__)
 CORS(app)
 asgi_app = WsgiToAsgi(app)
 
-user_repository = UsersRepository()
-like_repository = LikesRepository(user_repository)
-posts_repository = PostsRepository(user_repository)
-comments_repository = CommentsRepository(user_repository)
+users_repository = UsersRepository()
+likes_repository = LikesRepository(users_repository)
+posts_repository = PostsRepository(users_repository)
+comments_repository = CommentsRepository(users_repository)
 
-user_service = UsersService(user_repository)
-like_service = LikesService(user_repository, like_repository)
-posts_service = PostsService(user_repository, posts_repository, comments_repository)
-comments_service = CommentsService(user_repository, comments_repository)
-auth_service = AuthService(user_repository)
+users_service = UsersService(users_repository)
+likes_service = LikesService(users_repository, likes_repository)
+posts_service = PostsService(users_repository, posts_repository, comments_repository)
+comments_service = CommentsService(users_repository, comments_repository)
+auth_service = AuthService(users_repository)
 
 
 @app.route('/')
@@ -46,7 +46,7 @@ def login():
 
 @app.route('/signup', methods=['POST'])
 def signup():
-    token = user_service.create_user(request.get_json())
+    token = users_service.create_user(request.get_json())
     return json.dumps(token), 201
 
 
@@ -72,7 +72,7 @@ def get_user_profil(username):
     if auth_service.is_token_valid(request.headers.get("X-token-id")) is False:
         return 'Invalid token', 401
     else:
-        response = user_repository.get_user_profil_data(username)
+        response = users_repository.get_user_profil_data(username)
     return json.dumps(response), 200
 
 
@@ -81,8 +81,21 @@ def like():
     if auth_service.is_token_valid(request.headers.get("X-token-id")) is False:
         return 'Invalid token', 401
     if request.method == 'POST':
-        like_service.like(request.headers.get("X-token-id"), request.get_json())
-        return "like successful", 200
+        return likes_service.like(request.headers.get("X-token-id"), request.get_json())
+    elif request.method == 'DELETE':
+        return likes_service.unlike(request.headers.get("X-token-id"), request.get_json())
+    else:
+        return 'Method not allowed', 405
+
+
+@app.route('/post', methods=['POST', 'DELETE'])
+def post():
+    if auth_service.is_token_valid(request.headers.get("X-token-id")) is False:
+        return 'Invalid token', 401
+    if request.method == 'POST':
+        return posts_service.post(request.headers.get("X-token-id"), request.get_json())
+    elif request.method == 'DELETE':
+        return posts_service.delete_post(request.headers.get("X-token-id"), request.get_json())
     else:
         return 'Method not allowed', 405
 
@@ -92,7 +105,7 @@ def search_user(query: str):
     if auth_service.is_token_valid(request.headers.get("X-token-id")) is False:
         return 'Invalid token', 401
     else:
-        response = user_repository.search_user(query)
+        response = users_repository.search_user(query)
     return json.dumps(response), 200
 
 

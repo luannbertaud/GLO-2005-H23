@@ -24,3 +24,19 @@ class PostsService:
             for com in post["comments"]:
                 com["timestamp"] = time.mktime(com["timestamp"].timetuple())
         return query_res
+
+    def post(self, token_id, input_post):
+        if token_id is None:
+            raise MissingParameterException("token_id is missing")
+        if self.user_repository.get_user_by_token(token_id) == input_post["author"]:
+            return self.posts_repository.post(input_post)
+        else:
+            return 'Unauthorized', 401
+
+    def delete_post(self, token_id, input_post):
+        if token_id is None:
+            raise MissingParameterException("token_id is missing")
+        if self.user_repository.get_user_by_token(token_id) == input_post["author"]:
+            return self.posts_repository.delete_post(input_post)
+        else:
+            return 'Unauthorized', 401

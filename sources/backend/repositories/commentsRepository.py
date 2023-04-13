@@ -57,7 +57,6 @@ class CommentsRepository:
 
     def create_comment(self, post_id, author, body, timestamp):
         connection = self.__create_connection()
-        new_id = None
         affected_columns = 0
         try:
             cursor = connection.cursor()
