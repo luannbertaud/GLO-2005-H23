@@ -1,6 +1,7 @@
 "use client";
 
 import CitationCard from "@/components/CitationCard";
+import CitationCreator from "@/components/CitationCreator";
 import {useEffect, useState} from 'react';
 import { ValidateAccess } from "@/components/Access";
 import {useRouter} from "next/navigation";
@@ -18,6 +19,7 @@ export default function Feed() {
     if (loading) return <Loading/>;
     return (
         <div className="grid grid-row-1 gap-12 w-screen h-screen max-h-screen overflow-y-scroll items-center justify-center pt-5">
+            <CitationCreator/>
             <CitationCard/>
             <CitationCard/>
             <CitationCard/>
