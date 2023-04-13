@@ -4,7 +4,6 @@ import React, {useState} from "react";
 import Comment from "@/components/Comment";
 import NewComment from "@/components/NewComment";
 import {secondsToRelative} from "@/components/TimeParsing";
-import {GrantAccess} from "@/components/Access";
 import {useCookies} from "react-cookie";
 
 export default function CitationCard({ body } : any) {
@@ -37,15 +36,38 @@ export default function CitationCard({ body } : any) {
 
         if (res.ok) {
             await res.json().then(j => {
-                let new_card = {
+                setCard({
                     ...card,
                     "comments": [j, ...card.comments]
-                };
-                setCard(new_card);
+                });
             })
         } else {
             await res.json().then(j => {
                 alert(j.desc);
+            })
+        }
+    }
+
+
+    async function userCommentDelete(comment_id : number) {
+        let res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/comments/${comment_id}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-token-id': JSON.parse(Buffer.from(cookies["ipaper_user_token"], 'base64').toString('ascii')).token_id,
+          },
+        });
+
+        if (res.ok) {
+            await res.text().then(_ => {
+                setCard({
+                    ...card,
+                    "comments": [...(card.comments.filter((c: any) => c.id !== comment_id))]
+                });
+            })
+        } else {
+            await res.text().then(r => {
+                alert(r);
             })
         }
     }
@@ -90,7 +112,7 @@ export default function CitationCard({ body } : any) {
                     <NewComment newCommentCallback={userComment}/>
                      {
                          card.comments.map((c : any)=> {
-                            return <Comment body={c} key={c.id}/>
+                            return <Comment body={c} key={c.id} deleteCallback={userCommentDelete}/>
                         })
                      }
                 </div>

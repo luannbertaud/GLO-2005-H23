@@ -1,19 +1,37 @@
 "use client";
 
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {secondsToRelative} from "@/components/TimeParsing";
+import {useCookies} from "react-cookie";
 
-export default function Comment({ body } : any) {
-    const [comment, setComment] : [any, any] = useState(body);
+export default function Comment({ body, deleteCallback } : any) {
+    const [comment] : [any, any] = useState(body);
+    const [userIsAuthor, setUserIsAuthor]: [boolean, any] = useState(false);
+    const [cookies]: [any, any, any] = useCookies(['user']);
+
+    useEffect(() => {
+        if (JSON.parse(Buffer.from(cookies["ipaper_user_token"], 'base64').toString('ascii')).username === body.author)
+            setUserIsAuthor(true);
+    }, [cookies, body.author])
 
     return (
         <div  className={"h-fit w-full relative"}>
-            <p className={"w-fit max-w-[80%] h-fit text-gray-600 font-semibold break-all inline-block"}>
-                @{comment.author}:
-            </p>
-            <p className={"w-fit max-w-[20%] h-fit text-gray-400 break-all inline-block absolute right-0 text-[90%]"}>
-                {secondsToRelative(comment.timestamp)}
-            </p>
+            <div className={"w-full h-fit flex items-center"}>
+                <p className={"w-fit max-w-[80%] h-fit text-gray-600 font-semibold break-all inline-block"}>
+                    @{comment.author}:
+                </p>
+                <div className={"flex-grow"}/>
+                {
+                    userIsAuthor
+                    ? <button className={"w-fit h-fit p-1 px-2 text-white inline-block text-[80%] bg-red-400 rounded-full mr-2"} onClick={() => deleteCallback(body.id)}>
+                        Delete
+                    </button>
+                    : null
+                }
+                <div className={"w-fit h-fit text-gray-400 break-all inline-block text-[90%]"}>
+                    {secondsToRelative(comment.timestamp)}
+                </div>
+            </div>
             <p className={"w-fit max-w-full h-fit text-gray-600 break-all ml-3"}>
                 {comment.body}
             </p>
