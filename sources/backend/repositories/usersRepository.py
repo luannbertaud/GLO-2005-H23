@@ -3,7 +3,7 @@ from uuid import uuid4, UUID
 from passlib.hash import sha256_crypt
 import datetime
 
-from sources.backend.exceptions.InvalidParameterException import InvalidParameterException
+from exceptions.InvalidParameterException import InvalidParameterException
 
 
 class UsersRepository:

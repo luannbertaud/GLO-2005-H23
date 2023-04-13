@@ -1,6 +1,6 @@
 import pymysql
 
-from sources.backend.repositories.usersRepository import UsersRepository
+from repositories.usersRepository import UsersRepository
 
 
 class LikesRepository:

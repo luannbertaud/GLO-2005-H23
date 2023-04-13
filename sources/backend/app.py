@@ -2,11 +2,11 @@ import json
 
 from flask import Flask, request
 
-from sources.backend.repositories.usersRepository import UsersRepository
-from sources.backend.repositories.likesRepository import LikesRepository
-from sources.backend.services.authService import AuthService
-from sources.backend.services.usersService import UsersService
-from sources.backend.services.likesService import LikesService
+from repositories.usersRepository import UsersRepository
+from repositories.likesRepository import LikesRepository
+from services.authService import AuthService
+from services.usersService import UsersService
+from services.likesService import LikesService
 
 app = Flask(__name__)
 

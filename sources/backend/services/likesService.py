@@ -1,7 +1,7 @@
-from sources.backend.repositories.usersRepository import UsersRepository
-from sources.backend.repositories.likesRepository import LikesRepository
+from repositories.usersRepository import UsersRepository
+from repositories.likesRepository import LikesRepository
 
-from sources.backend.exceptions.MissingParameterException import MissingParameterException
+from exceptions.MissingParameterException import MissingParameterException
 
 class LikesService:
 

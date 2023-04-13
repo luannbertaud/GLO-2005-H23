@@ -1,8 +1,8 @@
 import re
 
-from sources.backend.exceptions.InvalidParameterException import InvalidParameterException
-from sources.backend.exceptions.MissingParameterException import MissingParameterException
-from sources.backend.repositories.usersRepository import UsersRepository
+from exceptions.InvalidParameterException import InvalidParameterException
+from exceptions.MissingParameterException import MissingParameterException
+from repositories.usersRepository import UsersRepository
 
 
 class AuthService:
