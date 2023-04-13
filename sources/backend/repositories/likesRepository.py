@@ -51,7 +51,7 @@ class LikesRepository:
         if self.is_like_already_exists(author, post_id) is True:
             try:
                 cursor = connection.cursor()
-                request = f"DELETE FROM Likes WHERE author='{author}' AND post_id={post_id}"
+                request = f"DELETE FROM Likes WHERE author='{author}' AND post_id={post_id};"
                 cursor.execute(request)
                 return "UnLike successful", 200
             finally:
