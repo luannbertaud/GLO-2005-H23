@@ -1,22 +1,37 @@
 "use client";
 
 export async function ValidateAccess(router: any, cookieValue: string) {
-    if (cookieValue === undefined || cookieValue === "")
+    if (cookieValue === undefined || cookieValue === "") {
         await router.push("/authentification");
+        return;
+    }
+
+    let token_id = undefined;
+    try {
+        token_id = JSON.parse(decodeURIComponent(cookieValue)).token_id
+    } catch (SyntaxError) {
+        await router.push("/authentification");
+    }
 
     let res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/verify_token`, {
           method: 'GET',
           headers: {
-            'Content-Type': 'application/json',
-            'X-token-id': JSON.parse(decodeURIComponent(cookieValue)).token_id,
+            'X-token-id': token_id,
           },
-        });
+    });
 
     if (!res.ok)
         await router.push("/authentification");
 }
 
-export async function RemoveAccess(remover: any, router: any) {
+export async function RemoveAccess(remover: any, router: any, cookieValue : string) {
+    await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/logout`, {
+          method: 'POST',
+          headers: {
+            'X-token-id': JSON.parse(decodeURIComponent(cookieValue)).token_id,
+          },
+    });
+
     remover("ipaper_user_token")
     await router.push("/authentification");
 }
