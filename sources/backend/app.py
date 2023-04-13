@@ -25,7 +25,7 @@ comments_repository = CommentsRepository(users_repository)
 
 users_service = UsersService(users_repository)
 likes_service = LikesService(users_repository, likes_repository)
-posts_service = PostsService(users_repository, posts_repository, comments_repository)
+posts_service = PostsService(users_repository, posts_repository, comments_repository, likes_repository)
 comments_service = CommentsService(users_repository, comments_repository)
 auth_service = AuthService(users_repository)
 

@@ -7,19 +7,12 @@ import {secondsToRelative} from "@/components/TimeParsing";
 import {useCookies} from "react-cookie";
 
 export default function CitationCard({ body } : any) {
-    const [userLiked, setUserLiked] = React.useState(false);
+    const [userLiked, setUserLiked] = React.useState(body.user_like);
     const [commentsOpened, setCommentsOpened] = React.useState(false);
     const [card, setCard] : [any, any] = useState(body);
     const [cookies]: [any, any, any] = useCookies(['user']);
     const commentsContainerRef = React.createRef<HTMLDivElement>();
 
-    async function userLike() {
-        await new Promise(r => setTimeout(r, 500));
-        setUserLiked(true);
-        // loadCitationCard(id).then((c) => {
-        //     setCard({...c, "likes": c.likes+1});
-        // });
-    }
 
     async function userComment(content : string) {
         let res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/comments`, {
@@ -72,6 +65,53 @@ export default function CitationCard({ body } : any) {
         }
     }
 
+
+    async function userLike() {
+        let res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/like`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-token-id': JSON.parse(Buffer.from(cookies["ipaper_user_token"], 'base64').toString('ascii')).token_id,
+          },
+          body: JSON.stringify({ "post_id": card.id }),
+        });
+
+        if (res.ok) {
+            await res.text().then(_ => {
+                setCard({ ...card, "likes": card.likes + 1 });
+                setUserLiked(true);
+            });
+        } else
+            await res.text().then(r => alert(r));
+    }
+
+
+    async function userUnLike() {
+        let res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/like`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-token-id': JSON.parse(Buffer.from(cookies["ipaper_user_token"], 'base64').toString('ascii')).token_id,
+          },
+          body: JSON.stringify({ "post_id": card.id }),
+        });
+
+        if (res.ok) {
+            await res.text().then(_ => {
+                setCard({ ...card, "likes": card.likes - 1 });
+                setUserLiked(false);
+            });
+        } else
+            await res.text().then(r => alert(r));
+    }
+
+
+    async function handleLikeClick() {
+        if (userLiked)
+            await userUnLike();
+        else await userLike();
+    }
+
     async function toggleComments() {
         const commentsContainer = commentsContainerRef.current;
         if (!commentsOpened) {
@@ -99,7 +139,7 @@ export default function CitationCard({ body } : any) {
             <p>&nbsp;&nbsp;&nbsp;&nbsp;{card.body}</p>
             <div className={"grid grid-cols-3 gap-5 transition-all duration-700 -mb-5"}>
                 <div className={"border-t-2 w-full col-span-3"}/>
-                <button type={"button"} className={`w-fit h-11 rounded-full bg-gray-200 p-2 px-3 inline-flex items-center justify-center gap-2`} onClick={() => userLike()}>
+                <button type={"button"} className={`w-fit h-11 rounded-full bg-gray-200 p-2 px-3 inline-flex items-center justify-center gap-2`} onClick={() => handleLikeClick()}>
                     <img src={userLiked ? "/like.png" : "/like_empty.png"} className="w-4 text-gray-400" alt={""}/>
                     {card.likes}
                 </button>
