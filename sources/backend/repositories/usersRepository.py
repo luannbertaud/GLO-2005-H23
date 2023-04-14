@@ -85,6 +85,17 @@ class UsersRepository:
         finally:
             connection.close()
 
+    def delete_user(self, token_id):
+        connection = self.__create_connection()
+        for stocked_token in self.tokens:
+            if stocked_token["token_id"] == UUID(token_id):
+                try:
+                    cursor = connection.cursor()
+                    request = f"DELETE FROM Users WHERE //TODO"
+                    cursor.execute(request)
+                finally:
+                    connection.close()
+                
     def is_username_already_exists(self, username):
         connection = self.__create_connection()
         try:
@@ -132,6 +143,25 @@ class UsersRepository:
                 return stocked_token["username"]
         return None
 
+    def get_user_info_by_username(self, username):
+        connection = self.__create_connection()
+        try:
+            cursor = connection.cursor()
+            request = f"SELECT * FROM Users WHERE username = '{username}';"
+            cursor.execute(request)
+            return cursor.fetchone()
+        finally:
+            connection.close()
+
+    def delete_user(self, username):
+        connection = self.__create_connection()
+        try:
+            cursor = connection.cursor()
+            request = f"DELETE FROM Users WHERE username = '{username}';"
+            return cursor.execute(request) != 0
+        finally:
+            connection.close()
+
     def search_user(self, query: str):
         connection = self.__create_connection()
         users = []
@@ -144,3 +174,4 @@ class UsersRepository:
         finally:
             connection.close()
         return users
+                

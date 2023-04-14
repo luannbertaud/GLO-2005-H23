@@ -13,6 +13,12 @@ class UsersService:
         self.__verify_signup_input(signup_input)
         return self.user_repository.create_user(signup_input)
 
+    def delete_user(self, token_id, username):
+        if token_id is None:
+            raise MissingParameterException("token_id is missing")
+        self.user_repository.delete_user(username)
+        return "Successfully deleted", 200
+
     def __verify_signup_input(self, signup_input):
         if 'email' not in signup_input or 'username' not in signup_input or 'first_name' not in signup_input \
                 or 'last_name' not in signup_input or 'bio' not in signup_input or 'password' not in signup_input:

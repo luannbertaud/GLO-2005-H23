@@ -66,14 +66,17 @@ def verify_token():
 
 # ----- User -----
 
-
-@app.route('/profil/<string:username>', methods=['GET'])
+@app.route('/profil/<string:username>', methods=['GET', 'DELETE'])
 def get_user_profil(username):
     if auth_service.is_token_valid(request.headers.get("X-token-id")) is False:
         return 'Invalid token', 401
+    if request.method == 'GET':
+        return json.dumps(users_repository.get_user_info_by_username(username)), 200
+    elif request.method == 'DELETE':
+        response = users_repository.get_user_by_token(request.headers.get("X-token-id"))
+        return users_service.delete_user(request.headers.get("X-token-id"), response)
     else:
-        response = users_repository.get_user_profil_data(username)
-    return json.dumps(response), 200
+        return 'Method not allowed', 405
 
 
 @app.route('/like', methods=['POST', 'DELETE'])
