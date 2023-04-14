@@ -3,13 +3,12 @@ from uuid import uuid4, UUID
 from passlib.hash import sha256_crypt
 import datetime
 
-from sources.backend.exceptions.InvalidParameterException import InvalidParameterException
+from exceptions.InvalidParameterException import InvalidParameterException
 
 
 class UsersRepository:
 
     def __init__(self):
-        print("1")
         self.tokens = []
 
     @staticmethod
@@ -17,8 +16,8 @@ class UsersRepository:
         return pymysql.connect(
             host="localhost",
             user="root",
-            password="@Riane24",
-            db="GLO_2005_H23",
+            password="password",
+            db="instapaper",
             autocommit=True
         )
 
@@ -30,9 +29,10 @@ class UsersRepository:
             cursor = connection.cursor()
             request = f"SELECT password FROM Authentication WHERE email = '{email}';"
             cursor.execute(request)
-            hashed_password = cursor.fetchone()[0]
-            if hashed_password is None:
+            entry = cursor.fetchone()
+            if entry is None:
                 raise InvalidParameterException("email invalid")
+            hashed_password = entry[0]
             if sha256_crypt.verify(password, hashed_password):
                 username = self.get_username_by_email(email)
                 return {
@@ -132,5 +132,15 @@ class UsersRepository:
                 return stocked_token["username"]
         return None
 
-
-        
+    def search_user(self, query: str):
+        connection = self.__create_connection()
+        users = []
+        try:
+            cursor = connection.cursor()
+            request = f"SELECT * FROM Users WHERE username LIKE '%{query}%' OR email LIKE '%{query}%@%';"
+            cursor.execute(request)
+            columns = [key[0] for key in cursor.description]
+            users = [dict(zip(columns, user)) for user in cursor.fetchall()]
+        finally:
+            connection.close()
+        return users

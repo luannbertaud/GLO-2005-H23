@@ -1,6 +1,9 @@
+from datetime import datetime
+
 import pymysql
 
-from sources.backend.repositories.usersRepository import UsersRepository
+from exceptions.InvalidParameterException import InvalidParameterException
+from repositories.usersRepository import UsersRepository
 
 
 class LikesRepository:
@@ -13,19 +16,57 @@ class LikesRepository:
         return pymysql.connect(
             host="localhost",
             user="root",
-            password="@Riane24",
-            db="GLO_2005_H23",
+            password="password",
+            db="instapaper",
             autocommit=True
         )
 
-    def like(self, input_like):
+    def like(self, author, post_id):
         connection = self.__create_connection()
-        author = input_like["author"]
-        post_id = input_like["post_id"]
-        timestamp = input_like["timestamp"]
+        timestamp = datetime.now().strftime("%Y-%m-%d %H-%M-%S")
+        if self.is_like_already_exists(author, post_id) is False:
+            try:
+                cursor = connection.cursor()
+                request = f"INSERT INTO Likes (author, post_id, timestamp)" \
+                          f"VALUES ('{author}', '{post_id}', '{timestamp}');"
+                return cursor.execute(request) != 0
+            finally:
+                connection.close()
+        else:
+            raise InvalidParameterException('This post is already like by this user')
+
+    def is_like_already_exists(self, author, post_id):
+        connection = self.__create_connection()
         try:
             cursor = connection.cursor()
-            request = f"INSERT INTO Likes (author, post_id, timestamp) VALUES ('{author}', '{post_id}', '{timestamp}');"
+            request = f"SELECT * FROM Likes WHERE author='{author}' AND post_id={post_id};"
             cursor.execute(request)
+            return cursor.fetchone() is not None
         finally:
             connection.close()
+
+    def unlike(self, author, post_id):
+        connection = self.__create_connection()
+        if self.is_like_already_exists(author, post_id) is True:
+            try:
+                cursor = connection.cursor()
+                request = f"DELETE FROM Likes WHERE author='{author}' AND post_id={post_id};"
+                return cursor.execute(request) != 0
+            finally:
+                connection.close()
+        else:
+            raise InvalidParameterException('This post is not already liked by this user')
+
+    def count_likes_of_post(self, post_id):
+        connection = self.__create_connection()
+        try:
+            cursor = connection.cursor()
+            request = f"SELECT COUNT(id) FROM Likes WHERE post_id={post_id};"
+            cursor.execute(request)
+            count = cursor.fetchone()
+            if count is None or len(count) <= 0:
+                return 0
+            return count[0]
+        finally:
+            connection.close()
+

@@ -1,57 +1,115 @@
 'use client';
 
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import Comment from "@/components/Comment";
 import NewComment from "@/components/NewComment";
 import {secondsToRelative} from "@/components/TimeParsing";
-import Loading from "@/app/loading";
+import {useCookies} from "react-cookie";
 
-async function loadCitationCard(id :string) {
-    await new Promise(r => setTimeout(r, 200));
-    // let res = await fetch("");
-    let post = {
-        "author": "Tom",
-        "body": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
-        "timestamp": 983646381,
-        "police": "",
-        "likes": 108,
-        "userLike": false,
-        "comments": [
-            1, 2, 3, 4
-        ]
-    };
-    return {...post, "timestamp": secondsToRelative(post.timestamp)};
-}
-
-export default function CitationCard({ id } : any) {
-    const [userLiked, setUserLiked] = React.useState(false);
+export default function CitationCard({ body } : any) {
+    const [userLiked, setUserLiked] = React.useState(body.user_like);
     const [commentsOpened, setCommentsOpened] = React.useState(false);
-    const [card, setCard] : [any, any] = useState(undefined);
+    const [card, setCard] : [any, any] = useState(body);
+    const [cookies]: [any, any, any] = useCookies(['user']);
     const commentsContainerRef = React.createRef<HTMLDivElement>();
 
-    useEffect(() => {
-        if (card === undefined)
-            loadCitationCard(id).then((c) => {
-                setUserLiked(c.userLike);
-                setCard(c);
-            });
-    })
-    if (card === undefined) return <Loading/>;
-
-    async function userLike() {
-        await new Promise(r => setTimeout(r, 500));
-        setUserLiked(true);
-        loadCitationCard(id).then((c) => {
-            setCard({...c, "likes": c.likes+1});
-        });
-    }
 
     async function userComment(content : string) {
-        console.log(content)
-        await new Promise(r => setTimeout(r, 500));
-        loadCitationCard(id).then((c) => {
-            setCard({...c, "comments": [...c.comments, 8]});
+        let res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/comments`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-token-id': JSON.parse(Buffer.from(cookies["ipaper_user_token"], 'base64').toString('ascii')).token_id,
+          },
+          body: JSON.stringify({
+              "body": content,
+              "post_id": card.id,
+          }),
         });
+
+        if (res.ok) {
+            await res.json().then(j => {
+                setCard({
+                    ...card,
+                    "comments": [j, ...card.comments]
+                });
+            })
+        } else {
+            await res.json().then(j => {
+                alert(j.desc);
+            })
+        }
+    }
+
+
+    async function userCommentDelete(comment_id : number) {
+        let res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/comments/${comment_id}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-token-id': JSON.parse(Buffer.from(cookies["ipaper_user_token"], 'base64').toString('ascii')).token_id,
+          },
+        });
+
+        if (res.ok) {
+            await res.text().then(_ => {
+                setCard({
+                    ...card,
+                    "comments": [...(card.comments.filter((c: any) => c.id !== comment_id))]
+                });
+            })
+        } else {
+            await res.text().then(r => {
+                alert(r);
+            })
+        }
+    }
+
+
+    async function userLike() {
+        let res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/like`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-token-id': JSON.parse(Buffer.from(cookies["ipaper_user_token"], 'base64').toString('ascii')).token_id,
+          },
+          body: JSON.stringify({ "post_id": card.id }),
+        });
+
+        if (res.ok) {
+            await res.text().then(_ => {
+                setCard({ ...card, "likes": card.likes + 1 });
+                setUserLiked(true);
+            });
+        } else
+            await res.text().then(r => alert(r));
+    }
+
+
+    async function userUnLike() {
+        let res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/like`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-token-id': JSON.parse(Buffer.from(cookies["ipaper_user_token"], 'base64').toString('ascii')).token_id,
+          },
+          body: JSON.stringify({ "post_id": card.id }),
+        });
+
+        if (res.ok) {
+            await res.text().then(_ => {
+                setCard({ ...card, "likes": card.likes - 1 });
+                setUserLiked(false);
+            });
+        } else
+            await res.text().then(r => alert(r));
+    }
+
+
+    async function handleLikeClick() {
+        if (userLiked)
+            await userUnLike();
+        else await userLike();
     }
 
     async function toggleComments() {
@@ -81,7 +139,7 @@ export default function CitationCard({ id } : any) {
             <p>&nbsp;&nbsp;&nbsp;&nbsp;{card.body}</p>
             <div className={"grid grid-cols-3 gap-5 transition-all duration-700 -mb-5"}>
                 <div className={"border-t-2 w-full col-span-3"}/>
-                <button type={"button"} className={`w-fit h-11 rounded-full bg-gray-200 p-2 px-3 inline-flex items-center justify-center gap-2`} onClick={() => userLike()}>
+                <button type={"button"} className={`w-fit h-11 rounded-full bg-gray-200 p-2 px-3 inline-flex items-center justify-center gap-2`} onClick={() => handleLikeClick()}>
                     <img src={userLiked ? "/like.png" : "/like_empty.png"} className="w-4 text-gray-400" alt={""}/>
                     {card.likes}
                 </button>
@@ -89,12 +147,12 @@ export default function CitationCard({ id } : any) {
                     <img src={"/down-arrow.svg"} className={`${commentsOpened ? "scale-y-[-1]" : ""} w-4 text-gray-400`} alt={""}/>
                     Comments
                 </button>
-                <p className={"inline-flex items-center justify-end text-gray-500"}>{card.timestamp}</p>
+                <p className={"inline-flex items-center justify-end text-gray-500"}>{secondsToRelative(card.timestamp)}</p>
                 <div ref={commentsContainerRef} className={"scrollbar-hidden col-span-3 transition-all duration-700 max-h-0 overflow-hidden opacity-0 grid gap-5 overflow-y-scroll border-t-2"}>
                     <NewComment newCommentCallback={userComment}/>
                      {
-                         card.comments.map((cId : any, index : number)=> {
-                            return <Comment id={cId} key={index}/>
+                         card.comments.map((c : any)=> {
+                            return <Comment body={c} key={c.id} deleteCallback={userCommentDelete}/>
                         })
                      }
                 </div>
