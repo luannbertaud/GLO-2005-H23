@@ -7,14 +7,16 @@ import Notification from "@/components/NotificationElement"
 import { RemoveAccess } from "@/components/Access";
 import { useRouter } from "next/navigation";
 import { useCookies } from "react-cookie";
+
 export default function NavBar() {
   const [menuOpened, setMenuOpened] = useState(false);
+  const [suggestions, setSuggestions] = useState([]);
   const router = useRouter();
   const [cookies, __, removeCookie]: [any, any, any] = useCookies(["user"]);
+
   let username = "";
   if (cookies["ipaper_user_token"] !== undefined)
     username = JSON.parse(Buffer.from(cookies["ipaper_user_token"], 'base64').toString('ascii')).username;
-  const [suggestions, setSuggestions] = useState([]);
 
   function toggleMenu(value: any) {
     const menu = document.getElementById("menu");
@@ -25,22 +27,20 @@ export default function NavBar() {
   }
 
   async function loadSuggestions(event: any) {
-    const input = event.target.value;
+    const input = event.currentTarget.value;
     if (input == "")
       return;
     await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/search/${input}`, {
       method: "GET",
       headers: {
-        "X-token-id": JSON.parse(
-          Buffer.from(cookies["ipaper_user_token"], "base64").toString("ascii")
-        ).token_id,
+        'Content-Type': 'application/json',
+        "X-token-id": JSON.parse(Buffer.from(cookies["ipaper_user_token"], "base64").toString("ascii")).token_id,
       },
     })
       .then((r) => {
         r.json().then((j) => {
           if (r.ok) {
             setSuggestions(j.slice(0, 5));
-            console.log(suggestions);
           }
           else router.push("/");
         });

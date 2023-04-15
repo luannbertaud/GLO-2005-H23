@@ -113,7 +113,7 @@ def search_user(query: str):
         return 'Invalid token', 401
     else:
         response = users_repository.search_user(query)
-    return json.dumps(response), 200
+    return response, 200
 
 
 # ----- Notifications -----
