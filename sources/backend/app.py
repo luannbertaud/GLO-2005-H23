@@ -118,10 +118,10 @@ def search_user(query: str):
 # ----- Notifications -----
 
 @app.route('/notifs', methods=['GET'])
-def get_all_notif():
+def get_last_notifs():
     if auth_service.is_token_valid(request.headers.get("X-token-id")) is False:
         return 'Invalid token', 401
-    res = notif_service.get_all_notif(request.headers.get("X-token-id"))
+    res = notif_service.get_last_notifs(request.headers.get("X-token-id"))
     return json.dumps(res), 200
 
 # ----- Posts -----
