@@ -45,3 +45,17 @@ class PostsService:
             return self.posts_repository.delete_post(input_post)
         else:
             return 'Unauthorized', 401
+
+    def get_posts_for_user(self, token_id, username: str):
+        if token_id is None:
+            raise MissingParameterException("token_id is missing")
+        query_res = self.posts_repository.get_posts_of_user(username)
+        for post in query_res:
+            post["timestamp"] = time.mktime(post["timestamp"].timetuple())
+            post["comments"] = self.comments_repository.get_comments_of_post(post["id"])
+            post["likes"] = self.likes_repository.count_likes_of_post(post["id"])
+            post["user_like"] = self.likes_repository.is_like_already_exists(
+                self.user_repository.get_user_by_token(token_id), post["id"])
+            for com in post["comments"]:
+                com["timestamp"] = time.mktime(com["timestamp"].timetuple())
+        return query_res

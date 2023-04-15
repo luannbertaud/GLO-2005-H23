@@ -2,15 +2,19 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { Popover } from "@varld/popover";
+import Notification from "@/components/NotificationElement"
 import { RemoveAccess } from "@/components/Access";
 import { useRouter } from "next/navigation";
 import { useCookies } from "react-cookie";
-
 export default function NavBar() {
   const [menuOpened, setMenuOpened] = useState(false);
-  const [suggestions, setSuggestions] = useState([]);
   const router = useRouter();
   const [cookies, __, removeCookie]: [any, any, any] = useCookies(["user"]);
+  let username = "";
+  if (cookies["ipaper_user_token"] !== undefined)
+    username = JSON.parse(Buffer.from(cookies["ipaper_user_token"], 'base64').toString('ascii')).username;
+  const [suggestions, setSuggestions] = useState([]);
 
   function toggleMenu(value: any) {
     const menu = document.getElementById("menu");
@@ -81,23 +85,42 @@ export default function NavBar() {
         </button>
       </div>
       <button
-        className={`w-fit h-11 rounded-full border-2 p-2 px-4 inline-flex items-center justify-center gap-2`}
+        className={`w-fit h-11 rounded-full border-2 p-2 px-4 inline-flex items-center justify-center gap-2 hover:bg-gray-100 active:bg-gray-200`}
+        onClick={() => {
+          router.push("/");
+        }}
       >
         <img src={"/write.svg"} className={"w-4 text-gray-400"} alt={""} />
         New Post
       </button>
-      <button
-        className={`w-fit h-11 rounded-full border-2 p-2 px-2 inline-flex items-center justify-center`}
+      <Popover
+        popover={( ) => {
+          return (
+            <div className="popover divide-y divide-gray-200">
+              <h5 className="font-medium">Notifications</h5>
+                {[...Array(5)].map((e, i) => <Notification className="busterCards" key={i}/>)}
+            </div>
+          );
+        }}
       >
-        <img src={"/notification.png"} className={"w-6 opacity-80"} alt={""} />
-      </button>
+        <button
+          className={`w-fit h-11 rounded-full border-2 p-2 px-2 inline-flex items-center justify-center relative hover:bg-gray-100 active:bg-gray-200`}
+        >
+          <img
+            src={"/notification.png"}
+            className={"w-6 opacity-80"}
+            alt={""}
+          />
+          <span className="top-0 left-7 absolute  w-3.5 h-3.5 bg-red-500 border-2 border-white rounded-full"></span>
+        </button>
+      </Popover>
       <button
         className={
           "bg-gray-800 rounded-full w-12 h-12 text-white justify-center flex items-center font-bold text-[110%] relative"
         }
         onClick={() => toggleMenu(undefined)}
       >
-        <img src={"/profile.png"} className={"w-6"} alt={""} />
+        <img src={"/profile.png"} className={"w-6"} alt={"profile"} />
       </button>
       <div
         id="menu"
@@ -109,7 +132,7 @@ export default function NavBar() {
           className={"text-[180%]"}
           onClick={() => {
             toggleMenu(false);
-            router.push("/profile");
+            router.push(`/profile/${username}`);
           }}
         >
           Profile

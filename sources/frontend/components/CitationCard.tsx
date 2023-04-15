@@ -5,6 +5,7 @@ import Comment from "@/components/Comment";
 import NewComment from "@/components/NewComment";
 import {secondsToRelative} from "@/components/TimeParsing";
 import {useCookies} from "react-cookie";
+import {useRouter} from "next/navigation";
 
 export default function CitationCard({ body } : any) {
     const [userLiked, setUserLiked] = React.useState(body.user_like);
@@ -12,6 +13,7 @@ export default function CitationCard({ body } : any) {
     const [card, setCard] : [any, any] = useState(body);
     const [cookies]: [any, any, any] = useCookies(['user']);
     const commentsContainerRef = React.createRef<HTMLDivElement>();
+    const router = useRouter();
 
 
     async function userComment(content : string) {
@@ -132,10 +134,10 @@ export default function CitationCard({ body } : any) {
 
     return (
         <div className="flex h-fit w-fit max-w-2xl flex-col gap-5 rounded-2xl p-5 pt-7 font-mono shadow-2xl max-h-md">
-            <div className={"w-full justify-start flex gap-2 items-center gray-400 col-span-3 pr-5"}>
+            <button className={"w-fit justify-start flex gap-2 items-center gray-400 col-span-3 pr-5"} onClick={() => router.push(`/profile/${card.author}`)}>
                 <div className={"bg-gray-800 rounded-full w-12 h-12 text-white justify-center flex items-center font-bold text-[110%]"}>{card.author.charAt(0).toUpperCase()}</div>
                 <p className={"font-bold"}>@{card.author}</p>
-            </div>
+            </button>
             <p>&nbsp;&nbsp;&nbsp;&nbsp;{card.body}</p>
             <div className={"grid grid-cols-3 gap-5 transition-all duration-700 -mb-5"}>
                 <div className={"border-t-2 w-full col-span-3"}/>
