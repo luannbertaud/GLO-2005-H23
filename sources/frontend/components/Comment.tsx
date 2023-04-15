@@ -3,6 +3,7 @@
 import {useEffect, useState} from "react";
 import {secondsToRelative} from "@/components/TimeParsing";
 import {useCookies} from "react-cookie";
+import Link from "next/link";
 
 export default function Comment({ body, deleteCallback } : any) {
     const [comment] : [any, any] = useState(body);
@@ -17,9 +18,9 @@ export default function Comment({ body, deleteCallback } : any) {
     return (
         <div  className={"h-fit w-full relative"}>
             <div className={"w-full h-fit flex items-center"}>
-                <p className={"w-fit max-w-[80%] h-fit text-gray-600 font-semibold break-all inline-block"}>
+                <Link className={"w-fit max-w-[80%] h-fit text-gray-600 font-semibold break-all inline-block"} href={`profile/${comment.author}`}>
                     @{comment.author}:
-                </p>
+                </Link>
                 <div className={"flex-grow"}/>
                 {
                     userIsAuthor

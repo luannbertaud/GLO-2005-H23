@@ -70,3 +70,16 @@ class LikesRepository:
         finally:
             connection.close()
 
+    def count_likes_for_user(self, username):
+        connection = self.__create_connection()
+        try:
+            cursor = connection.cursor()
+            request = f"SELECT COUNT(l.id) FROM Likes as l, Posts as p" \
+                      f" WHERE l.post_id = p.id AND p.author = '{username}';"
+            cursor.execute(request)
+            count = cursor.fetchone()
+            if count is None or len(count) <= 0:
+                return 0
+            return count[0]
+        finally:
+            connection.close()
