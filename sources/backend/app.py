@@ -26,7 +26,7 @@ posts_repository = PostsRepository(users_repository)
 comments_repository = CommentsRepository(users_repository)
 notif_repository = NotificationsRepository(users_repository)
 
-users_service = UsersService(users_repository)
+users_service = UsersService(users_repository, likes_repository)
 likes_service = LikesService(users_repository, likes_repository)
 posts_service = PostsService(users_repository, posts_repository, comments_repository, likes_repository)
 comments_service = CommentsService(users_repository, comments_repository)
@@ -70,12 +70,12 @@ def verify_token():
 
 # ----- User -----
 
-@app.route('/profil/<string:username>', methods=['GET', 'DELETE'])
+@app.route('/profile/<string:username>', methods=['GET', 'DELETE'])
 def get_user_profil(username):
     if auth_service.is_token_valid(request.headers.get("X-token-id")) is False:
         return 'Invalid token', 401
     if request.method == 'GET':
-        return json.dumps(users_service.get_user_info_by_username(request.headers.get("X-token-id"), username)), 200
+        return json.dumps(users_service.get_user_info_by_username(username)), 200
     elif request.method == 'DELETE':
         logged_user = users_repository.get_user_by_token(request.headers.get("X-token-id"))
         return users_service.delete_user(request.headers.get("X-token-id"), logged_user)
@@ -115,7 +115,9 @@ def search_user(query: str):
         response = users_repository.search_user(query)
     return json.dumps(response), 200
 
+
 # ----- Notifications -----
+
 
 @app.route('/notifs', methods=['GET', 'PATCH'])
 def get_last_notifs():
@@ -131,6 +133,7 @@ def get_last_notifs():
     else:
         return 'Method not allowed', 405
 
+
 # ----- Posts -----
 
 
@@ -139,6 +142,14 @@ def latest_posts():
     if auth_service.is_token_valid(request.headers.get("X-token-id")) is False:
         return 'Invalid token', 401
     res = posts_service.get_latest_posts(request.headers.get("X-token-id"), 0, 10)
+    return json.dumps(res), 200
+
+
+@app.route('/posts/<string:username>', methods=['GET'])
+def user_posts(username: str):
+    if auth_service.is_token_valid(request.headers.get("X-token-id")) is False:
+        return 'Invalid token', 401
+    res = posts_service.get_posts_for_user(request.headers.get("X-token-id"), username)
     return json.dumps(res), 200
 
 

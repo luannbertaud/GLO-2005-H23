@@ -70,3 +70,16 @@ class PostsRepository:
                 connection.close()
         else:
             raise InvalidParameterException("This post doesn't already exists")
+
+    def get_posts_of_user(self, username):
+        connection = self.__create_connection()
+        posts = []
+        try:
+            cursor = connection.cursor()
+            request = f"SELECT * FROM Posts WHERE author='{username}' ORDER BY timestamp DESC;"
+            cursor.execute(request)
+            columns = [key[0] for key in cursor.description]
+            posts = [dict(zip(columns, post)) for post in cursor.fetchall()]
+        finally:
+            connection.close()
+        return posts

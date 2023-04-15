@@ -57,7 +57,7 @@ class UsersRepository:
         connection = self.__create_connection()
         try:
             cursor = connection.cursor()
-            request = f"SELECT username FROM Users WHERE email = '{email}';"
+            request = f"SELECT username FROM Users WHERE LOWER(email) = LOWER('{email}');"
             cursor.execute(request)
             return cursor.fetchone()[0]
         finally:
@@ -91,17 +91,17 @@ class UsersRepository:
             if stocked_token["token_id"] == UUID(token_id):
                 try:
                     cursor = connection.cursor()
-                    request = f"DELETE FROM Users WHERE username = '{username}';"
+                    request = f"DELETE FROM Users WHERE LOWER(username) = LOWER('{username}');"
                     affected_columns = cursor.execute(request)
                 finally:
                     connection.close()
                 return affected_columns != 0
-                
+
     def is_username_already_exists(self, username):
         connection = self.__create_connection()
         try:
             cursor = connection.cursor()
-            request = f"SELECT * FROM Users WHERE username = '{username}';"
+            request = f"SELECT * FROM Users WHERE LOWER(username) = LOWER('{username}');"
             cursor.execute(request)
             return cursor.fetchone() is not None
         finally:
@@ -111,7 +111,7 @@ class UsersRepository:
         connection = self.__create_connection()
         try:
             cursor = connection.cursor()
-            request = f"SELECT * FROM Users WHERE email = '{email}';"
+            request = f"SELECT * FROM Users WHERE LOWER(email) = LOWER('{email}');"
             cursor.execute(request)
             return cursor.fetchone() is not None
         finally:
@@ -144,23 +144,26 @@ class UsersRepository:
                 return stocked_token["username"]
         return None
 
-    def get_user_info_by_username(self, token_id, username):
+    def get_user_info_by_username(self, username):
         connection = self.__create_connection()
-        for stocked_token in self.tokens:
-            if stocked_token["token_id"] == UUID(token_id):
-                try:
-                    cursor = connection.cursor()
-                    request = f"SELECT * FROM Users WHERE username = '{username}';"
-                    cursor.execute(request)
-                    return cursor.fetchone()
-                finally:
-                    connection.close()
+        user = None
+        try:
+            cursor = connection.cursor()
+            request = f"SELECT * FROM Users WHERE LOWER(username) = LOWER('{username}');"
+            cursor.execute(request)
+            columns = [key[0] for key in cursor.description]
+            u_raw = cursor.fetchone()
+            if u_raw is not None:
+                user = dict(zip(columns, u_raw))
+        finally:
+            connection.close()
+        return user
 
     def delete_user(self, token_id, username):
         connection = self.__create_connection()
         try:
             cursor = connection.cursor()
-            request = f"DELETE FROM Users WHERE username = '{username}';"
+            request = f"DELETE FROM Users WHERE LOWER(username) = LOWER('{username}');"
             self.logout(token_id)
             return cursor.execute(request) != 0
         finally:
@@ -171,11 +174,36 @@ class UsersRepository:
         users = []
         try:
             cursor = connection.cursor()
-            request = f"SELECT * FROM Users WHERE username LIKE '%{query}%' OR email LIKE '%{query}%@%';"
+            request = f"SELECT * FROM Users WHERE LOWER(username) LIKE LOWER('%{query}%') OR LOWER(email) LIKE LOWER('%{query}%@%');"
             cursor.execute(request)
             columns = [key[0] for key in cursor.description]
             users = [dict(zip(columns, user)) for user in cursor.fetchall()]
         finally:
             connection.close()
         return users
-                
+
+    def count_followers(self, username):
+        connection = self.__create_connection()
+        try:
+            cursor = connection.cursor()
+            request = f"SELECT COUNT(id) FROM Follows WHERE LOWER(followed) = LOWER('{username}');"
+            cursor.execute(request)
+            count = cursor.fetchone()
+            if count is None or len(count) <= 0:
+                return 0
+            return count[0]
+        finally:
+            connection.close()
+
+    def count_following(self, username):
+        connection = self.__create_connection()
+        try:
+            cursor = connection.cursor()
+            request = f"SELECT COUNT(id) FROM Follows WHERE LOWER(follower) = LOWER('{username}');"
+            cursor.execute(request)
+            count = cursor.fetchone()
+            if count is None or len(count) <= 0:
+                return 0
+            return count[0]
+        finally:
+            connection.close()
