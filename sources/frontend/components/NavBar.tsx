@@ -10,7 +10,7 @@ import { useCookies } from "react-cookie";
 export default function NavBar() {
   const [menuOpened, setMenuOpened] = useState(false);
   const router = useRouter();
-  const [_, __, removeCookie]: [any, any, any] = useCookies(["user"]);
+  const [cookies, __, removeCookie]: [any, any, any] = useCookies(["user"]);
 
   function toggleMenu(value: any) {
     const menu = document.getElementById("menu");
@@ -21,7 +21,7 @@ export default function NavBar() {
   }
 
   function logout() {
-    RemoveAccess(removeCookie, router).then(() => {
+    RemoveAccess(removeCookie, router, cookies["ipaper_user_token"]).then(() => {
       toggleMenu(false);
     });
   }

@@ -1,0 +1,21 @@
+version: "3"
+
+services:
+
+  database:
+    container_name: instapaper-database-container
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    environment:
+      MYSQL_DATABASE: 'instapaper'
+      MYSQL_ROOT_PASSWORD: 'password'
+    ports:
+      - '3306:3306'
+    restart: always
+    # expose:
+    #   # Opens port 3306 on the container
+    #   - '3306'
+    #   # Where our data will be persisted
+    # volumes:
+    #   - my-db:/var/lib/mysql
