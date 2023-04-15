@@ -117,12 +117,19 @@ def search_user(query: str):
 
 # ----- Notifications -----
 
-@app.route('/notifs', methods=['GET'])
+@app.route('/notifs', methods=['GET', 'PATCH'])
 def get_last_notifs():
     if auth_service.is_token_valid(request.headers.get("X-token-id")) is False:
         return 'Invalid token', 401
-    res = notif_service.get_last_notifs(request.headers.get("X-token-id"))
-    return json.dumps(res), 200
+    if request.method == 'GET':
+        res = notif_service.get_last_notifs(request.headers.get("X-token-id"))
+        return res, 200
+    elif request.method == 'PATCH':
+        if notif_service.set_read_notifs(request.headers.get("X-token-id")) is True:
+            return 'Notifications marked as read', 200
+        return 'Notifications have already been read', 400
+    else:
+        return 'Method not allowed', 405
 
 # ----- Posts -----
 

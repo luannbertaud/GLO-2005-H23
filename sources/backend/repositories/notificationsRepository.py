@@ -1,10 +1,16 @@
 from datetime import datetime
 
+import json
 import pymysql
 
 from exceptions.InvalidParameterException import InvalidParameterException
 from repositories.usersRepository import UsersRepository
 
+class DateTimeEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, datetime):
+            return obj.strftime("%Y-%m-%d %H:%M:%S")
+        return json.JSONEncoder.default(self, obj)
 
 class NotificationsRepository:
 
@@ -25,19 +31,17 @@ class NotificationsRepository:
         connection = self.__create_connection()
         try:
             cursor = connection.cursor()
-            request = f"SELECT post_id, l.author, l.timestamp, status FROM Likes AS l, Posts AS p, (SELECT * FROM Notifications WHERE type = 'like') AS n WHERE l.id = n.id AND p.id = l.post_id AND p.author = 'OceanicOctopus';"
-            """ request = f"SELECT Notifications.id, Follows.follower FROM Notifications JOIN Follows ON Notifications.type = 'follow' AND Notifications.id = Follows.id WHERE Follows.followed = 'GalacticSailor';" """
-            """ request = f"SELECT n.id, n.type, n.status, CASE " \
-                      f"WHEN n.type = 'like' THEN l.author WHEN n.type = 'comment' THEN c.author WHEN n.type = 'follow' THEN f.follower" \
-                      f"ELSE '' END AS author_name" \
-                      f"FROM Notifications n" \
-                      f"LEFT JOIN Likes l ON n.id = l.id AND n.type = 'like'" \
-                      f"LEFT JOIN Comments c ON n.id = c.id AND n.type = 'comment'" \
-                      f"LEFT JOIN Follows f ON n.id = f.id AND n.type = 'follow'" \
-                      f"WHERE f.follower = '{username}' OR l.author = '{username}' OR c.author = '{username}'" \
-                      f"ORDER BY n.id DESC LIMIT 5;" """
+            request = f"SELECT n.id, n.type, n.status, CASE WHEN n.type = 'like' THEN l.author WHEN n.type = 'comment' THEN c.author WHEN n.type = 'follow' THEN f.follower ELSE '' END AS author_name FROM Notifications n LEFT JOIN Likes l ON n.id = l.id AND n.type = 'like' LEFT JOIN Comments c ON n.id = c.id AND n.type = 'comment' LEFT JOIN Follows f ON n.id = f.id AND n.type = 'follow' WHERE f.follower = 'CelestialCentipede' OR l.author = 'CelestialCentipede' OR c.author = 'CelestialCentipede' ORDER BY n.id DESC LIMIT 5;"
             cursor.execute(request)
             res = cursor.fetchall()
-            return res
+            return json.dumps(res, cls=DateTimeEncoder)
+        finally: connection.close()
+
+    def set_notifs_read(self, username):
+        connection = self.__create_connection()
+        try:
+            cursor = connection.cursor()
+            request = f"UPDATE Notifications SET status = 'read' WHERE id IN (SELECT id FROM (SELECT id FROM Likes WHERE author = 'CelestialCentipede' UNION ALL SELECT id FROM Comments WHERE author = 'CelestialCentipede' UNION ALL SELECT id FROM Follows WHERE follower = 'CelestialCentipede') AS sub_query);"
+            return cursor.execute(request) != 0
         finally: connection.close()
 
