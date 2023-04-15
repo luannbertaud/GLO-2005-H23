@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { Popover } from "@varld/popover";
-import Notification from "@/components/NotificationElement"
+import Notification from "@/components/NotificationElement";
 import { RemoveAccess } from "@/components/Access";
 import { useRouter } from "next/navigation";
 import { useCookies } from "react-cookie";
@@ -11,12 +11,15 @@ import { useCookies } from "react-cookie";
 export default function NavBar() {
   const [menuOpened, setMenuOpened] = useState(false);
   const [suggestions, setSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const router = useRouter();
   const [cookies, __, removeCookie]: [any, any, any] = useCookies(["user"]);
 
   let username = "";
   if (cookies["ipaper_user_token"] !== undefined)
-    username = JSON.parse(Buffer.from(cookies["ipaper_user_token"], 'base64').toString('ascii')).username;
+    username = JSON.parse(
+      Buffer.from(cookies["ipaper_user_token"], "base64").toString("ascii")
+    ).username;
 
   function toggleMenu(value: any) {
     const menu = document.getElementById("menu");
@@ -28,21 +31,22 @@ export default function NavBar() {
 
   async function loadSuggestions(event: any) {
     const input = event.currentTarget.value;
-    if (input == "")
-      return;
+    if (input == "") return;
     await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/search/${input}`, {
       method: "GET",
       headers: {
-        'Content-Type': 'application/json',
-        "X-token-id": JSON.parse(Buffer.from(cookies["ipaper_user_token"], "base64").toString("ascii")).token_id,
+        "Content-Type": "application/json",
+        "X-token-id": JSON.parse(
+          Buffer.from(cookies["ipaper_user_token"], "base64").toString("ascii")
+        ).token_id,
       },
     })
       .then((r) => {
         r.json().then((j) => {
           if (r.ok) {
             setSuggestions(j.slice(0, 5));
-          }
-          else router.push("/");
+            console.log(j.slice(0, 5));
+          } else router.push("/");
         });
       })
       .catch((e) => {
@@ -73,16 +77,46 @@ export default function NavBar() {
       </Link>
       <span className={"flex-grow"}></span>
       <div className={"flex justify-center items-center"}>
-        <input
-          type={"text"}
-          onChange={loadSuggestions}
-          className={`w-fit h-11 rounded-l-full border-2 border-r-0 outline-none p-2 px-4`}
-        />
-        <button
-          className={`w-fit h-11 rounded-r-full border-2 border-l-0 bg-gray-200 p-2 px-3 inline-flex items-center justify-center`}
-        >
-          <img src={"/search.png"} className={"w-5 text-gray-400"} alt={""} />
-        </button>
+        <div className="relative">
+          <input
+            type={"text"}
+            placeholder="Search a user..."
+            onChange={loadSuggestions}
+            onFocus={(e) => {
+              setShowSuggestions(true);
+            }}
+            onBlur={(e) => {
+              setTimeout(() => setShowSuggestions(false), 200)
+            }}
+            className={`w-fit h-11 rounded-full border-2 outline-none p-2 pl-8 px-4`}
+          />
+          <svg
+            className="w-4 h-4 absolute left-2.5 top-3.5"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            />
+          </svg>
+          <div
+            id="suggestionContainer"
+            className={`${showSuggestions ? 'visible' : 'invisible'} absolute mt-2 w-full overflow-hidden rounded-md bg-white`}
+          >
+            {suggestions.map((e:any, i) => (
+              <div onClick={() => router.push(`/profile/${e.username}`)} className="cursor-pointer py-2 px-3 hover:bg-slate-100" key={i}>
+                <p className="text-sm font-medium text-gray-600">
+                  {e.username}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
       <button
         className={`w-fit h-11 rounded-full border-2 p-2 px-4 inline-flex items-center justify-center gap-2 hover:bg-gray-100 active:bg-gray-200`}
@@ -94,11 +128,13 @@ export default function NavBar() {
         New Post
       </button>
       <Popover
-        popover={( ) => {
+        popover={() => {
           return (
             <div className="popover divide-y divide-gray-200">
               <h5 className="font-medium">Notifications</h5>
-                {[...Array(5)].map((e, i) => <Notification className="busterCards" key={i}/>)}
+              {[...Array(5)].map((e, i) => (
+                <Notification className="busterCards" key={i} />
+              ))}
             </div>
           );
         }}
