@@ -23,14 +23,13 @@ export default function Profile({params} : any) {
                   'X-token-id': JSON.parse(Buffer.from(cookies["ipaper_user_token"], 'base64').toString('ascii')).token_id,
             },
           }).then(r => r.json().then(j => {
-            console.log(j)
             if (r.ok)
                 setData(j);
             else
-                router.push('/profile');
+                router.push('/');
           })).catch(e => {
               console.error(e);
-              router.push('/profile');
+              router.push('/');
           });
     }
 
@@ -41,14 +40,13 @@ export default function Profile({params} : any) {
                 'X-token-id': JSON.parse(Buffer.from(cookies["ipaper_user_token"], 'base64').toString('ascii')).token_id,
             },
         }).then(r => r.json().then(j => {
-            console.log(j)
             if (r.ok)
                 setPosts(j);
             else
-                router.push('/profile');
+                router.push('/');
         })).catch(e => {
             console.error(e);
-            router.push('/profile');
+            router.push('/');
         });
     }
 

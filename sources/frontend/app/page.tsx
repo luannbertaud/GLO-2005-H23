@@ -15,10 +15,13 @@ export default function Feed() {
     const [posts, setPosts] = useState([]);
 
     async function loadPosts() {
+        let token_id = "";
+        if (cookies["ipaper_user_token"])
+            token_id = JSON.parse(Buffer.from(cookies["ipaper_user_token"], 'base64').toString('ascii')).token_id;
         fetch(`${process.env.NEXT_PUBLIC_API_HOST}/posts`, {
               method: 'GET',
               headers: {
-                'X-token-id': JSON.parse(Buffer.from(cookies["ipaper_user_token"], 'base64').toString('ascii')).token_id,
+                'X-token-id': token_id,
               },
         }).then(r => r.json().then(j => {
             setPosts(j);

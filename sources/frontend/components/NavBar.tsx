@@ -11,6 +11,9 @@ export default function NavBar() {
   const [menuOpened, setMenuOpened] = useState(false);
   const router = useRouter();
   const [cookies, __, removeCookie]: [any, any, any] = useCookies(["user"]);
+  let username = "";
+  if (cookies["ipaper_user_token"] !== undefined)
+    username = JSON.parse(Buffer.from(cookies["ipaper_user_token"], 'base64').toString('ascii')).username;
 
   function toggleMenu(value: any) {
     const menu = document.getElementById("menu");
@@ -86,7 +89,7 @@ export default function NavBar() {
         }
         onClick={() => toggleMenu(undefined)}
       >
-        U
+        <img src={"/profile.png"} className={"w-6"} alt={"profile"} />
       </button>
       <div
         id="menu"
@@ -98,7 +101,7 @@ export default function NavBar() {
           className={"text-[180%]"}
           onClick={() => {
             toggleMenu(false);
-            router.push(`/profile/${JSON.parse(Buffer.from(cookies["ipaper_user_token"], 'base64').toString('ascii')).username}`);
+            router.push(`/profile/${username}`);
           }}
         >
           Profile
