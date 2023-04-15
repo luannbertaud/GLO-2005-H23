@@ -85,16 +85,17 @@ class UsersRepository:
         finally:
             connection.close()
 
-    def delete_user(self, token_id):
+    def delete_user(self, token_id, username):
         connection = self.__create_connection()
         for stocked_token in self.tokens:
             if stocked_token["token_id"] == UUID(token_id):
                 try:
                     cursor = connection.cursor()
-                    request = f"DELETE FROM Users WHERE //TODO"
-                    cursor.execute(request)
+                    request = f"DELETE FROM Users WHERE username = '{username}';"
+                    affected_columns = cursor.execute(request)
                 finally:
                     connection.close()
+                return affected_columns != 0
                 
     def is_username_already_exists(self, username):
         connection = self.__create_connection()
@@ -143,21 +144,24 @@ class UsersRepository:
                 return stocked_token["username"]
         return None
 
-    def get_user_info_by_username(self, username):
+    def get_user_info_by_username(self, token_id, username):
         connection = self.__create_connection()
-        try:
-            cursor = connection.cursor()
-            request = f"SELECT * FROM Users WHERE username = '{username}';"
-            cursor.execute(request)
-            return cursor.fetchone()
-        finally:
-            connection.close()
+        for stocked_token in self.tokens:
+            if stocked_token["token_id"] == UUID(token_id):
+                try:
+                    cursor = connection.cursor()
+                    request = f"SELECT * FROM Users WHERE username = '{username}';"
+                    cursor.execute(request)
+                    return cursor.fetchone()
+                finally:
+                    connection.close()
 
-    def delete_user(self, username):
+    def delete_user(self, token_id, username):
         connection = self.__create_connection()
         try:
             cursor = connection.cursor()
             request = f"DELETE FROM Users WHERE username = '{username}';"
+            self.logout(token_id)
             return cursor.execute(request) != 0
         finally:
             connection.close()

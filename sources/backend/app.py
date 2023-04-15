@@ -8,11 +8,13 @@ from repositories.commentsRepository import CommentsRepository
 from repositories.usersRepository import UsersRepository
 from repositories.likesRepository import LikesRepository
 from repositories.postsRepository import PostsRepository
+from repositories.notificationsRepository import NotificationsRepository
 from services.authService import AuthService
 from services.commentsService import CommentsService
 from services.postsService import PostsService
 from services.usersService import UsersService
 from services.likesService import LikesService
+from services.notificationsService import NotificationsService
 
 app = Flask(__name__)
 CORS(app)
@@ -22,12 +24,14 @@ users_repository = UsersRepository()
 likes_repository = LikesRepository(users_repository)
 posts_repository = PostsRepository(users_repository)
 comments_repository = CommentsRepository(users_repository)
+notif_repository = NotificationsRepository(users_repository)
 
 users_service = UsersService(users_repository)
 likes_service = LikesService(users_repository, likes_repository)
 posts_service = PostsService(users_repository, posts_repository, comments_repository, likes_repository)
 comments_service = CommentsService(users_repository, comments_repository)
 auth_service = AuthService(users_repository)
+notif_service = NotificationsService(users_repository, notif_repository)
 
 
 @app.route('/')
@@ -71,10 +75,10 @@ def get_user_profil(username):
     if auth_service.is_token_valid(request.headers.get("X-token-id")) is False:
         return 'Invalid token', 401
     if request.method == 'GET':
-        return json.dumps(users_repository.get_user_info_by_username(username)), 200
+        return json.dumps(users_service.get_user_info_by_username(request.headers.get("X-token-id"), username)), 200
     elif request.method == 'DELETE':
-        response = users_repository.get_user_by_token(request.headers.get("X-token-id"))
-        return users_service.delete_user(request.headers.get("X-token-id"), response)
+        logged_user = users_repository.get_user_by_token(request.headers.get("X-token-id"))
+        return users_service.delete_user(request.headers.get("X-token-id"), logged_user)
     else:
         return 'Method not allowed', 405
 
@@ -111,6 +115,14 @@ def search_user(query: str):
         response = users_repository.search_user(query)
     return json.dumps(response), 200
 
+# ----- Notifications -----
+
+@app.route('/notifs', methods=['GET'])
+def get_all_notif():
+    if auth_service.is_token_valid(request.headers.get("X-token-id")) is False:
+        return 'Invalid token', 401
+    res = notif_service.get_all_notif(request.headers.get("X-token-id"))
+    return json.dumps(res), 200
 
 # ----- Posts -----
 
