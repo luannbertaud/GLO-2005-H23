@@ -22,11 +22,12 @@ class UsersService:
         else:
             raise InvalidParameterException('User does not exist')
 
-    def get_user_info_by_username(self, token_id, username):
-        if token_id is None:
-            raise MissingParameterException("token_id is missing")
-        elif self.user_repository.is_username_already_exists(username):
-            return self.user_repository.get_user_info_by_username(token_id, username)
+    def get_user_info_by_username(self, username):
+        if self.user_repository.is_username_already_exists(username):
+            user = self.user_repository.get_user_info_by_username(username)
+            user['following'] = self.user_repository.count_following(username)
+            user['followers'] = self.user_repository.count_followers(username)
+            return user
         else:
             raise InvalidParameterException('User does not exist')
 

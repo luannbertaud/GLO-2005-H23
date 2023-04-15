@@ -75,7 +75,7 @@ def get_user_profil(username):
     if auth_service.is_token_valid(request.headers.get("X-token-id")) is False:
         return 'Invalid token', 401
     if request.method == 'GET':
-        return json.dumps(users_service.get_user_info_by_username(request.headers.get("X-token-id"), username)), 200
+        return json.dumps(users_service.get_user_info_by_username(username)), 200
     elif request.method == 'DELETE':
         logged_user = users_repository.get_user_by_token(request.headers.get("X-token-id"))
         return users_service.delete_user(request.headers.get("X-token-id"), logged_user)

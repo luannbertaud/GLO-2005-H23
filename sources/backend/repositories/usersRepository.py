@@ -96,7 +96,7 @@ class UsersRepository:
                 finally:
                     connection.close()
                 return affected_columns != 0
-                
+
     def is_username_already_exists(self, username):
         connection = self.__create_connection()
         try:
@@ -144,17 +144,20 @@ class UsersRepository:
                 return stocked_token["username"]
         return None
 
-    def get_user_info_by_username(self, token_id, username):
+    def get_user_info_by_username(self, username):
         connection = self.__create_connection()
-        for stocked_token in self.tokens:
-            if stocked_token["token_id"] == UUID(token_id):
-                try:
-                    cursor = connection.cursor()
-                    request = f"SELECT * FROM Users WHERE username = '{username}';"
-                    cursor.execute(request)
-                    return cursor.fetchone()
-                finally:
-                    connection.close()
+        user = None
+        try:
+            cursor = connection.cursor()
+            request = f"SELECT * FROM Users WHERE username = '{username}';"
+            cursor.execute(request)
+            columns = [key[0] for key in cursor.description]
+            u_raw = cursor.fetchone()
+            if u_raw is not None:
+                user = dict(zip(columns, u_raw))
+        finally:
+            connection.close()
+        return user
 
     def delete_user(self, token_id, username):
         connection = self.__create_connection()
@@ -178,4 +181,29 @@ class UsersRepository:
         finally:
             connection.close()
         return users
-                
+
+    def count_followers(self, username):
+        connection = self.__create_connection()
+        try:
+            cursor = connection.cursor()
+            request = f"SELECT COUNT(id) FROM Follows WHERE followed='{username}';"
+            cursor.execute(request)
+            count = cursor.fetchone()
+            if count is None or len(count) <= 0:
+                return 0
+            return count[0]
+        finally:
+            connection.close()
+
+    def count_following(self, username):
+        connection = self.__create_connection()
+        try:
+            cursor = connection.cursor()
+            request = f"SELECT COUNT(id) FROM Follows WHERE follower='{username}';"
+            cursor.execute(request)
+            count = cursor.fetchone()
+            if count is None or len(count) <= 0:
+                return 0
+            return count[0]
+        finally:
+            connection.close()
