@@ -1,13 +1,16 @@
 import re
+
 from exceptions.InvalidParameterException import InvalidParameterException
 from exceptions.MissingParameterException import MissingParameterException
+from repositories.likesRepository import LikesRepository
 from repositories.usersRepository import UsersRepository
 
 
 class UsersService:
 
-    def __init__(self, user_repository: UsersRepository):
+    def __init__(self, user_repository: UsersRepository, like_repository: LikesRepository):
         self.user_repository = user_repository
+        self.like_repository = like_repository
 
     def create_user(self, signup_input):
         self.__verify_signup_input(signup_input)
@@ -27,6 +30,7 @@ class UsersService:
             user = self.user_repository.get_user_info_by_username(username)
             user['following'] = self.user_repository.count_following(username)
             user['followers'] = self.user_repository.count_followers(username)
+            user['likes'] = self.like_repository.count_likes_for_user(username)
             return user
         else:
             raise InvalidParameterException('User does not exist')

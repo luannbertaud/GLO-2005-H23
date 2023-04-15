@@ -42,10 +42,10 @@ export default function Feed() {
         <div className="grid grid-row-1 gap-12 w-screen h-screen max-h-screen overflow-y-scroll items-center justify-center pt-5">
             <CitationCreator/>
             {
-                 posts.map((p : any, index : number)=> {
-                    return <CitationCard body={p} key={index}/>
+                posts.map((p : any)=> {
+                    return <CitationCard body={p} key={p.id}/>
                 })
-             }
+            }
         </div>
     )
 }

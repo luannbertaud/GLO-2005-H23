@@ -98,7 +98,7 @@ export default function NavBar() {
           className={"text-[180%]"}
           onClick={() => {
             toggleMenu(false);
-            router.push("/profile");
+            router.push(`/profile/${JSON.parse(Buffer.from(cookies["ipaper_user_token"], 'base64').toString('ascii')).username}`);
           }}
         >
           Profile
