@@ -33,6 +33,30 @@ export default function Profile({params} : any) {
           });
     }
 
+    async function userPostDelete(post_id : number) {
+      let res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/post`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-token-id': JSON.parse(Buffer.from(cookies["ipaper_user_token"], 'base64').toString('ascii')).token_id,
+          body: JSON.stringify({
+            "author": JSON.parse(Buffer.from(cookies["ipaper_user_token"], 'base64').toString('ascii')).username,
+            "post_id": post_id,
+          }),
+        },
+      });
+
+      if (res.ok) {
+          await res.text().then(_ => {
+              loadPosts();
+          })
+      } else {
+          await res.text().then(r => {
+              alert(r);
+          })
+      }
+  }
+
     async function loadPosts() {
         await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/posts/${username}`, {
                 method: 'GET',
@@ -96,7 +120,7 @@ export default function Profile({params} : any) {
         <div className="grid grid-cols-3 gap-12 w-full h-full overflow-y-scroll justify-center p-16">
             {
                 posts.map((p : any)=> {
-                    return <CitationCard body={p} key={p.id}/>
+                    return <CitationCard body={p} key={p.id} deleteCallback={userPostDelete}/>
                 })
             }
         </div>

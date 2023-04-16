@@ -97,14 +97,23 @@ def like():
 
 @app.route('/post', methods=['POST', 'DELETE'])
 def post():
-    if auth_service.is_token_valid(request.headers.get("X-token-id")) is False:
-        return 'Invalid token', 401
-    if request.method == 'POST':
-        return posts_service.post(request.headers.get("X-token-id"), request.get_json())
-    elif request.method == 'DELETE':
-        return posts_service.delete_post(request.headers.get("X-token-id"), request.get_json())
-    else:
-        return 'Method not allowed', 405
+    try:
+        if auth_service.is_token_valid(request.headers.get("X-token-id")) is False:
+            return 'Invalid token', 401
+        if request.method == 'POST':
+            return posts_service.post(request.headers.get("X-token-id"), request.get_json())
+        elif request.method == 'DELETE':
+            print('T1')
+            print(request.get_json(force=True))
+            print('T11')
+            print(request.headers)
+            print('T111')
+            return posts_service.delete_post(request.headers.get("X-token-id"), request.get_json())
+        else:
+            return 'Method not allowed', 405
+    except Exception as e:
+        print(e)
+        return "aa", 400
 
 
 @app.route('/search/<string:query>', methods=['GET'])

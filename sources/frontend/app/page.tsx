@@ -14,6 +14,31 @@ export default function Feed() {
     const [loading, setLoading] = useState(true);
     const [posts, setPosts] = useState([]);
 
+    async function userPostDelete(post_id : number) {
+        console.log(post_id);
+        let res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/post`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-token-id': JSON.parse(Buffer.from(cookies["ipaper_user_token"], 'base64').toString('ascii')).token_id,
+            body: JSON.stringify({
+              "author": JSON.parse(Buffer.from(cookies["ipaper_user_token"], 'base64').toString('ascii')).username,
+              "post_id": post_id,
+            }),
+          },
+        });
+  
+        if (res.ok) {
+            await res.text().then(_ => {
+                loadPosts();
+            })
+        } else {
+            await res.text().then(r => {
+                alert(r);
+            })
+        }
+    }
+
     async function loadPosts() {
         let token_id = "";
         if (cookies["ipaper_user_token"])
@@ -46,7 +71,7 @@ export default function Feed() {
             <CitationCreator/>
             {
                 posts.map((p : any)=> {
-                    return <CitationCard body={p} key={p.id}/>
+                    return <CitationCard body={p} key={p.id} deleteCallback={userPostDelete}/>
                 })
             }
         </div>

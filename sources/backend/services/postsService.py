@@ -39,9 +39,12 @@ class PostsService:
             return 'Unauthorized', 401
 
     def delete_post(self, token_id, input_post):
+        print('T2')
+        print(input_post)
         if token_id is None:
             raise MissingParameterException("token_id is missing")
         if self.user_repository.get_user_by_token(token_id) == input_post["author"]:
+            print('T3')
             return self.posts_repository.delete_post(input_post)
         else:
             return 'Unauthorized', 401

@@ -1,20 +1,26 @@
 'use client';
 
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import Comment from "@/components/Comment";
 import NewComment from "@/components/NewComment";
 import {secondsToRelative} from "@/components/TimeParsing";
 import {useCookies} from "react-cookie";
 import {useRouter} from "next/navigation";
 
-export default function CitationCard({ body } : any) {
+export default function CitationCard({ body, deleteCallback } : any) {
     const [userLiked, setUserLiked] = React.useState(body.user_like);
     const [commentsOpened, setCommentsOpened] = React.useState(false);
     const [card, setCard] : [any, any] = useState(body);
     const [cookies]: [any, any, any] = useCookies(['user']);
     const commentsContainerRef = React.createRef<HTMLDivElement>();
     const router = useRouter();
+    const [userIsAuthor, setUserIsAuthor]: [boolean, any] = useState(false);
 
+    useEffect(() => {
+        if (JSON.parse(Buffer.from(cookies["ipaper_user_token"], 'base64').toString('ascii')).username === body.author)
+            setUserIsAuthor(true);
+        console.log(body.id);
+    }, [cookies, body.author, body.id])
 
     async function userComment(content : string) {
         let res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/comments`, {
@@ -134,10 +140,19 @@ export default function CitationCard({ body } : any) {
 
     return (
         <div className="flex h-fit w-full max-w-2xl flex-col gap-5 rounded-2xl p-5 pt-7 font-mono shadow-2xl max-h-md">
-            <button className={"w-fit justify-start flex gap-2 items-center gray-400 col-span-3 pr-5"} onClick={() => router.push(`/profile/${card.author}`)}>
-                <div className={"bg-gray-800 rounded-full w-12 h-12 text-white justify-center flex items-center font-bold text-[110%]"}>{card.author.charAt(0).toUpperCase()}</div>
-                <p className={"font-bold"}>@{card.author}</p>
-            </button>
+            <div className="flex justify-between">
+                <button className={"w-fit justify-start flex gap-2 items-center gray-400 col-span-3 pr-5"} onClick={() => router.push(`/profile/${card.author}`)}>
+                    <div className={"bg-gray-800 rounded-full w-12 h-12 text-white justify-center flex items-center font-bold text-[110%]"}>{card.author.charAt(0).toUpperCase()}</div>
+                    <p className={"font-bold"}>@{card.author}</p>
+                </button>
+                {
+                    userIsAuthor
+                    ? <button className={"w-fit h-fit p-1 px-2 text-white inline-block text-[80%] bg-red-400 rounded-full mr-2"} onClick={() => deleteCallback(body.id)}>
+                        Delete
+                    </button>
+                    : null
+                }
+            </div>
             <p>&nbsp;&nbsp;&nbsp;&nbsp;{card.body}</p>
             <div className={"grid grid-cols-3 gap-5 transition-all duration-700 -mb-5"}>
                 <div className={"border-t-2 w-full col-span-3"}/>

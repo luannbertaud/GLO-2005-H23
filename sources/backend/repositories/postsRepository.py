@@ -59,12 +59,13 @@ class PostsRepository:
             connection.close()
 
     def delete_post(self, input_post):
+        print(input_post)
         connection = self.__create_connection()
         post_id = input_post["post_id"]
         if self.is_post_already_exists(post_id) is True:
             try:
                 cursor = connection.cursor()
-                request = f"DELETE FROM Posts WHERE is='{post_id}';"
+                request = f"DELETE FROM Posts WHERE id='{post_id}';"
                 cursor.execute(request)
                 return "Delete post successful", 200
             finally:
