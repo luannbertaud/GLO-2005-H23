@@ -24,11 +24,12 @@ export default function Feed() {
                 'X-token-id': token_id,
               },
         }).then(r => r.json().then(j => {
-            setPosts(j);
-            setLoading(false)
+            if (r.ok) {
+                setPosts(j);
+                setLoading(false)
+            }
         })).catch(e => {
             console.error(e);
-            setLoading(false);
         });
     }
 
@@ -36,8 +37,6 @@ export default function Feed() {
         ValidateAccess(router, cookies["ipaper_user_token"]).then(() => {
             if (posts === undefined || posts.length === 0)
                 loadPosts();
-            else
-                setLoading(false);
         });
     })
     if (loading) return <Loading/>;
