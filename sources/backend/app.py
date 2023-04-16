@@ -129,7 +129,7 @@ def get_last_notifs():
     elif request.method == 'PATCH':
         if notif_service.set_read_notifs(request.headers.get("X-token-id")) is True:
             return 'Notifications marked as read', 200
-        return 'Notifications have already been read', 400
+        return 'Notifications have already been read', 200
     else:
         return 'Method not allowed', 405
 

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Popover } from "@varld/popover";
 import Notification from "@/components/NotificationElement";
@@ -9,11 +9,17 @@ import { useRouter } from "next/navigation";
 import { useCookies } from "react-cookie";
 
 export default function NavBar() {
-  const [menuOpened, setMenuOpened] = useState(false);
   const [suggestions, setSuggestions] = useState([]);
+  const [notificationsData, setNotificationsData] = useState([]);
+  const [menuOpened, setMenuOpened] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [showBadge, setShowBadge] = useState(false);
   const router = useRouter();
   const [cookies, __, removeCookie]: [any, any, any] = useCookies(["user"]);
+
+  useEffect(() => {
+    getNotifications();
+  }, []);
 
   let username = "";
   if (cookies["ipaper_user_token"] !== undefined)
@@ -29,9 +35,67 @@ export default function NavBar() {
     setMenuOpened(!menuOpened);
   }
 
+  async function getNotifications() {
+    await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/notifs`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "X-token-id": JSON.parse(
+          Buffer.from(cookies["ipaper_user_token"], "base64").toString("ascii")
+        ).token_id,
+      },
+    })
+      .then((r) => {
+        r.json().then((j) => {
+          if (r.ok) {
+            j.sort((a: (string | number | Date)[], b: (string | number | Date)[]) => new Date(b[2]).valueOf() - new Date(a[2]).valueOf());
+            console.log(j);
+            setNotificationsData(j);
+            if (j[0][3] === "unread") {
+              console.log("read")!
+              setShowBadge(true);
+            }
+          } else router.push("/");
+        });
+      })
+      .catch((e) => {
+        console.error(e);
+        router.push("/");
+      });
+  }
+
+  async function readNotifications() {
+    await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/notifs`, {
+      method: "PATCH",
+      headers: {
+        "X-token-id": JSON.parse(
+          Buffer.from(cookies["ipaper_user_token"], "base64").toString("ascii")
+        ).token_id,
+      },
+    })
+      .then((r) => {
+        r.text().then((j) => {
+          if (r.ok) {
+            console.log("reading notifs")
+            getNotifications();
+            setShowBadge(false);
+          }
+        }).catch(() => {
+          router.push("/");
+        });
+      })
+      .catch((e) => {
+        console.error(e);
+        router.push("/");
+      });
+  }
+
   async function loadSuggestions(event: any) {
     const input = event.currentTarget.value;
-    if (input == "") return;
+    if (input == "") {
+      setShowSuggestions(false);
+      return;
+    }
     await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/search/${input}`, {
       method: "GET",
       headers: {
@@ -86,7 +150,7 @@ export default function NavBar() {
               setShowSuggestions(true);
             }}
             onBlur={(e) => {
-              setTimeout(() => setShowSuggestions(false), 200)
+              setTimeout(() => setShowSuggestions(false), 200);
             }}
             className={`w-fit h-11 rounded-full border-2 outline-none p-2 pl-8 px-4`}
           />
@@ -98,18 +162,24 @@ export default function NavBar() {
             stroke="currentColor"
           >
             <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
               d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
             />
           </svg>
           <div
             id="suggestionContainer"
-            className={`${showSuggestions ? 'visible' : 'invisible'} absolute mt-2 w-full overflow-hidden rounded-md bg-white`}
+            className={`${
+              showSuggestions ? "visible" : "invisible"
+            } absolute mt-2 w-full overflow-hidden rounded-md bg-white`}
           >
-            {suggestions.map((e:any, i) => (
-              <div onClick={() => router.push(`/profile/${e.username}`)} className="cursor-pointer py-2 px-3 hover:bg-slate-100" key={i}>
+            {suggestions.map((e: any, i) => (
+              <div
+                onClick={() => router.push(`/profile/${e.username}`)}
+                className="cursor-pointer py-2 px-3 hover:bg-slate-100"
+                key={i}
+              >
                 <p className="text-sm font-medium text-gray-600">
                   {e.username}
                 </p>
@@ -132,14 +202,17 @@ export default function NavBar() {
           return (
             <div className="popover divide-y divide-gray-200">
               <h5 className="font-medium">Notifications</h5>
-              {[...Array(5)].map((e, i) => (
-                <Notification className="busterCards" key={i} />
+              {notificationsData.map((e, i) => (
+                <Notification body={e} key={i} />
               ))}
             </div>
           );
         }}
       >
         <button
+          onClick={() => {
+            readNotifications();
+          }}
           className={`w-fit h-11 rounded-full border-2 p-2 px-2 inline-flex items-center justify-center relative hover:bg-gray-100 active:bg-gray-200`}
         >
           <img
@@ -147,7 +220,11 @@ export default function NavBar() {
             className={"w-6 opacity-80"}
             alt={""}
           />
-          <span className="top-0 left-7 absolute  w-3.5 h-3.5 bg-red-500 border-2 border-white rounded-full"></span>
+          <span
+            className={`${
+              showBadge ? "visible" : "invisible"
+            } top-0 left-7 absolute  w-3.5 h-3.5 bg-red-500 border-2 border-white rounded-full`}
+          ></span>
         </button>
       </Popover>
       <button

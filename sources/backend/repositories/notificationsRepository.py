@@ -31,9 +31,17 @@ class NotificationsRepository:
         connection = self.__create_connection()
         try:
             cursor = connection.cursor()
-            request = f"SELECT n.id, n.type, n.status, CASE WHEN n.type = 'like' THEN l.author WHEN n.type = 'comment' THEN c.author WHEN n.type = 'follow' THEN f.follower ELSE '' END AS author_name FROM Notifications n LEFT JOIN Likes l ON n.id = l.id AND n.type = 'like' LEFT JOIN Comments c ON n.id = c.id AND n.type = 'comment' LEFT JOIN Follows f ON n.id = f.id AND n.type = 'follow' WHERE f.follower = 'CelestialCentipede' OR l.author = 'CelestialCentipede' OR c.author = 'CelestialCentipede' ORDER BY n.id DESC LIMIT 5;"
+            request = "SELECT follower, followed, timestamp, status, type FROM Follows AS f, (SELECT * FROM Notifications WHERE type = 'follow') AS n WHERE f.id = n.id AND followed = '{username}';"
             cursor.execute(request)
-            res = cursor.fetchall()
+            resFollow = cursor.fetchall()
+            request = "SELECT post_id, c.author, c.timestamp, status, type FROM Comments as c, Posts as p, (SELECT * FROM Notifications WHERE type = 'comment') as n WHERE c.id = n.id AND p.id = c.post_id AND p.author = '{username}';"
+            cursor.execute(request)
+            resComment = cursor.fetchall()
+            request = "SELECT post_id, l.author, l.timestamp, status, type FROM Likes as l, Posts as p, (SELECT * FROM Notifications WHERE type = 'like') as n WHERE l.id = n.id AND p.id = l.post_id AND p.author = '{username}';"
+            cursor.execute(request)
+            resLike = cursor.fetchall() 
+            res = resFollow + resComment + resLike
+            print(res)
             return json.dumps(res, cls=DateTimeEncoder)
         finally: connection.close()
 
@@ -41,7 +49,12 @@ class NotificationsRepository:
         connection = self.__create_connection()
         try:
             cursor = connection.cursor()
-            request = f"UPDATE Notifications SET status = 'read' WHERE id IN (SELECT id FROM (SELECT id FROM Likes WHERE author = 'CelestialCentipede' UNION ALL SELECT id FROM Comments WHERE author = 'CelestialCentipede' UNION ALL SELECT id FROM Follows WHERE follower = 'CelestialCentipede') AS sub_query);"
-            return cursor.execute(request) != 0
+            request = f"UPDATE Notifications SET status = 'read' WHERE type = 'follow' AND id IN (SELECT id FROM Follows WHERE followed = '{username}');"
+            res = cursor.execute(request) != 0
+            request = f"UPDATE Notifications n INNER JOIN Comments c ON n.id = c.id INNER JOIN Posts p ON c.post_id = p.id SET n.status = 'read' WHERE n.type = 'comment' AND c.author != '{username}' AND p.author = '{username}';"
+            res = cursor.execute(request) != 0
+            request = f"UPDATE Notifications AS n, Likes AS l, Posts AS p SET n.status = 'read' WHERE n.id = l.id AND l.post_id = p.id AND p.author = '{username}' AND n.type = 'like';"
+            res = cursor.execute(request) != 0
+            return res
         finally: connection.close()
 
