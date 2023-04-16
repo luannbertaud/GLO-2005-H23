@@ -24,7 +24,7 @@ class PostsRepository:
         posts = []
         try:
             cursor = connection.cursor()
-            request = f"SELECT * FROM Posts ORDER BY timestamp DESC LIMIT {page*page_size}, {page*page_size+page_size};"
+            request = f"SELECT * FROM Posts ORDER BY timestamp DESC LIMIT {page*page_size}, {page_size};"
             cursor.execute(request)
             columns = [key[0] for key in cursor.description]
             posts = [dict(zip(columns, post)) for post in cursor.fetchall()]

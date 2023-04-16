@@ -152,7 +152,7 @@ export default function CitationCard({ body } : any) {
     }
 
     return (
-        <div className="flex h-fit w-fit max-w-2xl flex-col gap-5 rounded-2xl p-5 pt-7 font-mono shadow-2xl max-h-md">
+        <div className="flex h-fit w-fit max-w-2xl flex-col gap-5 rounded-2xl p-5 pt-7 font-mono shadow-2xl max-h-md mx-auto">
             <button className={"w-fit justify-start flex gap-2 items-center gray-400 col-span-3 pr-5"} onClick={() => router.push(`/profile/${card.author}`)}>
                 <div className={"bg-gray-800 rounded-full w-12 h-12 text-white justify-center flex items-center font-bold text-[110%]"}>{card.author.charAt(0).toUpperCase()}</div>
                 <p className={"font-bold"}>@{card.author}</p>
