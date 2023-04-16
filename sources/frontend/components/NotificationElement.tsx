@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { secondsToRelative } from "./TimeParsing";
 
 type notifProps = {
@@ -27,7 +26,6 @@ export default function Notification({ body }: notifProps) {
         </div>
         <div className="flex-grow">
           <div className="font-medium text-sm text-gray-900">
-            { body === null ? "Pas de notifcations" : null}
             { body[4] === "like" ? `${body[1]} à aimé votre citation` : null}
             { body[4] === "comment" ? `${body[1]} à commenté votre citation` : null}
             { body[4] === "follow" ? `${body[1]} à commencé à vous suivre` : null}

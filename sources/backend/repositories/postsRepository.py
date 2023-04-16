@@ -1,3 +1,4 @@
+from datetime import datetime
 import pymysql
 
 from exceptions.InvalidParameterException import InvalidParameterException
@@ -37,7 +38,7 @@ class PostsRepository:
         author = input_post["author"]
         body = input_post["body"]
         police = input_post["police"]
-        timestamp = input_post["timestamp"]
+        timestamp = datetime.now().strftime("%Y-%m-%d %H-%M-%S")
         try:
             cursor = connection.cursor()
             request = f"INSERT INTO Posts (author, body, police, timestamp)" \

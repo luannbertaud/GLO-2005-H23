@@ -48,11 +48,12 @@ export default function NavBar() {
       .then((r) => {
         r.json().then((j) => {
           if (r.ok) {
+            if (j.length == 0) {
+              return [];
+            }
             j.sort((a: (string | number | Date)[], b: (string | number | Date)[]) => new Date(b[2]).valueOf() - new Date(a[2]).valueOf());
-            console.log(j);
             setNotificationsData(j);
             if (j[0][3] === "unread") {
-              console.log("read")!
               setShowBadge(true);
             }
           } else router.push("/");
@@ -76,8 +77,6 @@ export default function NavBar() {
       .then((r) => {
         r.text().then((j) => {
           if (r.ok) {
-            console.log("reading notifs")
-            getNotifications();
             setShowBadge(false);
           }
         }).catch(() => {
@@ -109,7 +108,6 @@ export default function NavBar() {
         r.json().then((j) => {
           if (r.ok) {
             setSuggestions(j.slice(0, 5));
-            console.log(j.slice(0, 5));
           } else router.push("/");
         });
       })

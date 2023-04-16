@@ -31,17 +31,19 @@ class NotificationsRepository:
         connection = self.__create_connection()
         try:
             cursor = connection.cursor()
-            request = "SELECT follower, followed, timestamp, status, type FROM Follows AS f, (SELECT * FROM Notifications WHERE type = 'follow') AS n WHERE f.id = n.id AND followed = '{username}';"
+            request = f"SELECT follower, followed, timestamp, status, type FROM Follows AS f, (SELECT * FROM Notifications WHERE type = 'follow') AS n WHERE f.id = n.id AND followed = '{username}';"
             cursor.execute(request)
             resFollow = cursor.fetchall()
-            request = "SELECT post_id, c.author, c.timestamp, status, type FROM Comments as c, Posts as p, (SELECT * FROM Notifications WHERE type = 'comment') as n WHERE c.id = n.id AND p.id = c.post_id AND p.author = '{username}';"
+            request = f"SELECT post_id, c.author, c.timestamp, status, type FROM Comments as c, Posts as p, (SELECT * FROM Notifications WHERE type = 'comment') as n WHERE c.id = n.id AND p.id = c.post_id AND p.author = '{username}';"
             cursor.execute(request)
             resComment = cursor.fetchall()
-            request = "SELECT post_id, l.author, l.timestamp, status, type FROM Likes as l, Posts as p, (SELECT * FROM Notifications WHERE type = 'like') as n WHERE l.id = n.id AND p.id = l.post_id AND p.author = '{username}';"
+            request = f"SELECT post_id, l.author, l.timestamp, status, type FROM Likes as l, Posts as p, (SELECT * FROM Notifications WHERE type = 'like') as n WHERE l.id = n.id AND p.id = l.post_id AND p.author = '{username}';"
             cursor.execute(request)
             resLike = cursor.fetchall() 
             res = resFollow + resComment + resLike
             print(res)
+            if (res == ()):
+                return json.dumps([])
             return json.dumps(res, cls=DateTimeEncoder)
         finally: connection.close()
 
