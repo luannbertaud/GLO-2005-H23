@@ -101,7 +101,7 @@ def get_user_profil(username):
     """
     Endpoint qui permet d'obtenir les informations sur un utilisateur en particulier.
     L'utilisateur doit être connecté pour accéder à cet endpoint.
-    :param username: Le nom d'utilisateur de du compte sur lequel nous souhaitons obtenir des informations.
+    :param username: Le nom d'utilisateur du compte sur lequel nous souhaitons obtenir des informations.
     :return: Un json contenant les informations suivantes : 'username', 'email', 'firstname', 'lastname', 'bio'
     'following', 'followers', 'likes'.
     """
@@ -220,7 +220,7 @@ def latest_posts():
 @app.route('/posts/<string:username>', methods=['GET'])
 def user_posts(username: str):
     """
-    Endpoint qui permet à un utilisateur récolter les derniers posts postés par un utilisateur specific.
+    Endpoint qui permet à un utilisateur récolter les derniers posts postés par un utilisateur spécifique.
     :param username: Le nom d'utilisateur à qui doivent appartenir les Posts.
     :return: Une list des Posts appartenant à l'utilisateur.
     """
@@ -236,7 +236,7 @@ def user_posts(username: str):
 @app.route('/comments/<int:comment_id>', methods=['GET'])
 def get_comment(comment_id: int):
     """
-    Endpoint qui permet d'obtenir les informations d'un commentaire specific.
+    Endpoint qui permet d'obtenir les informations d'un commentaire spécifique.
     Les données retournées sont : 'post_id', 'author', 'body', 'timestamp'.
     :param comment_id: L'id du commentaire ciblé.
     :return: Les données correspondantes au commentaire ciblé.
