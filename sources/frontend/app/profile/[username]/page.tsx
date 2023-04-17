@@ -34,15 +34,10 @@ export default function Profile({params} : any) {
     }
 
     async function userPostDelete(post_id : number) {
-      let res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/post`, {
+      let res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/post/${post_id}`, {
         method: 'DELETE',
         headers: {
-          'Content-Type': 'application/json',
           'X-token-id': JSON.parse(Buffer.from(cookies["ipaper_user_token"], 'base64').toString('ascii')).token_id,
-          body: JSON.stringify({
-            "author": JSON.parse(Buffer.from(cookies["ipaper_user_token"], 'base64').toString('ascii')).username,
-            "post_id": post_id,
-          }),
         },
       });
 
