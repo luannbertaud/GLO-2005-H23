@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Popover } from "@varld/popover";
 import Notification from "@/components/NotificationElement";
-import { RemoveAccess } from "@/components/Access";
+import {RemoveAccess, ValidateAccess} from "@/components/Access";
 import { useRouter } from "next/navigation";
 import { useCookies } from "react-cookie";
 
@@ -16,16 +16,21 @@ export default function NavBar() {
   const [showBadge, setShowBadge] = useState(false);
   const router = useRouter();
   const [cookies, __, removeCookie]: [any, any, any] = useCookies(["user"]);
-
-  useEffect(() => {
-    getNotifications();
-  }, []);
-
   let username = "";
-  if (cookies["ipaper_user_token"] !== undefined)
+
+  if (cookies["ipaper_user_token"] !== undefined && cookies["ipaper_user_token"].length !== 0)
     username = JSON.parse(
       Buffer.from(cookies["ipaper_user_token"], "base64").toString("ascii")
     ).username;
+
+  useEffect(() => {
+    if (cookies["ipaper_user_token"] === undefined || cookies["ipaper_user_token"].length === 0)
+      return;
+    ValidateAccess(router, cookies["ipaper_user_token"]).then(() => {
+        if (notificationsData === undefined || notificationsData.length === 0)
+            getNotifications();
+    });
+  }, []);
 
   function toggleMenu(value: any) {
     const menu = document.getElementById("menu");
