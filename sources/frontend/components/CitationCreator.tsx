@@ -42,7 +42,6 @@ export default function QuoteCreator() {
     });
     if (res.ok) {
         res.text().then(j => {
-            console.log(j)
             window.location.reload();
         })
     } else {

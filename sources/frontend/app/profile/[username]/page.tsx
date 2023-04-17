@@ -80,7 +80,7 @@ export default function Profile({params} : any) {
 
   if (data === undefined || posts === undefined) return <Loading/>;
   return (
-    <main className={styles.main}>
+    <main className={"flex flex-col justify-between items-center p-24 min-h-screen"}>
       <div className="w-full -mt-10 font-mono">
         <div className="flex flex-row">
           <div className="bg-black rounded-full w-64 h-64 flex items-center justify-center mr-16">

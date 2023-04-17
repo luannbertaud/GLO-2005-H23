@@ -34,7 +34,6 @@ export default function CitationCard({ body, deleteCallback } : any) {
     useEffect(() => {
         if (JSON.parse(Buffer.from(cookies["ipaper_user_token"], 'base64').toString('ascii')).username === body.author)
             setUserIsAuthor(true);
-        console.log(body.id);
     }, [cookies, body.author, body.id])
 
     for (let font of FONT_FAMILIES) {

@@ -41,7 +41,6 @@ class NotificationsRepository:
             cursor.execute(request)
             resLike = cursor.fetchall() 
             res = resFollow + resComment + resLike
-            print(res)
             if (res == ()):
                 return json.dumps([])
             return json.dumps(res, cls=DateTimeEncoder)
