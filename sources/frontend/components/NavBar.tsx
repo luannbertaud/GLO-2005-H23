@@ -26,8 +26,8 @@ export default function NavBar() {
   useEffect(() => {
     if (cookies["ipaper_user_token"] === undefined || cookies["ipaper_user_token"].length === 0)
       return;
-    ValidateAccess(router, cookies["ipaper_user_token"]).then(() => {
-        if (notificationsData === undefined || notificationsData.length === 0)
+    ValidateAccess(router, cookies["ipaper_user_token"]).then((valid) => {
+        if (notificationsData !== undefined && notificationsData.length === 0 && valid)
             getNotifications();
     });
   }, []);
