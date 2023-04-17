@@ -263,7 +263,7 @@ def create_comment():
     """
     Endpoint qui permet à un utilisateur de créer un commentaire. Les données nécessaires sont :
     'post_id' et 'body'.
-    :return: Les données du Post juste créé ou une InvalidParameterException
+    :return: Les données du Post juste créé ou une InvalidParameterException.
     """
     if auth_service.is_token_valid(request.headers.get("X-token-id")) is False:
         return 'Invalid token', 401

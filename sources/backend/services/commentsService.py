@@ -14,6 +14,12 @@ class CommentsService:
         self.comments_repository = comments_repository
 
     def delete(self, token_id, comment_id):
+        """
+        Méthode supprimant un Comment après avoir vérifié s'il existe.
+        :param token_id: Le token de l'utilisateur faisant la requête.
+        :param comment_id: L'id du Comment à supprimer.
+        :return: Un code 200 en cas de succès, un code 401 si l'utilisateur n'est pas autorisé.
+        """
         if token_id is None:
             raise MissingParameterException("token_id is missing")
         comment = self.comments_repository.get_comment_by_id(comment_id)
@@ -25,6 +31,12 @@ class CommentsService:
             return 'Success', 200
 
     def create(self, token_id, body):
+        """
+        Méthode créant un Comment dans la base de données.
+        :param token_id: Le token de l'utilisateur faisant la requête.
+        :param body: Paylod contenant les différentes données nécessaires à la création d'un Comment.
+        :return: Les données du Post juste créé ou une InvalidParameterException.
+        """
         if token_id is None:
             raise MissingParameterException("token_id is missing")
         user = self.user_repository.get_user_by_token(token_id)
@@ -38,6 +50,12 @@ class CommentsService:
             return self.get_comment_by_id(new_id)
 
     def get_comment_by_id(self, comment_id):
+        """
+        Méthode permettant d'obtenir les informations d'un commentaire spécifique.
+        Les données retournées sont : 'post_id', 'author', 'body', 'timestamp'.
+        :param comment_id: L'id du commentaire ciblé.
+        :return: Les données correspondantes au commentaire ciblé.
+        """
         com = self.comments_repository.get_comment_by_id(comment_id)
         com["timestamp"] = time.mktime(com["timestamp"].timetuple())
         return com
