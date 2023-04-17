@@ -3,6 +3,10 @@ from werkzeug.exceptions import HTTPException
 
 
 class MissingParameterException(HTTPException):
+    """
+    Exception personnalisée exprimant le manque d'un paramètre.
+    :param description: Information concernant le paramètre manquant.
+    """
     def __init__(self, description):
         self.code = 400
         self.description = description
