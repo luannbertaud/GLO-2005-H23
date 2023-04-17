@@ -17,6 +17,25 @@ export default function Feed() {
     const [pagination, setPagination] = useState([0, 10]);
     let debounceScroll = Date.now();
 
+    async function userPostDelete(post_id : number) {
+        let res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/post/${post_id}`, {
+          method: 'DELETE',
+          headers: {
+            'X-token-id': JSON.parse(Buffer.from(cookies["ipaper_user_token"], 'base64').toString('ascii')).token_id,
+          },
+        });
+
+        if (res.ok) {
+            await res.text().then(_ => {
+                loadPosts();
+            })
+        } else {
+            await res.text().then(r => {
+                alert(r);
+            })
+        }
+    }
+
     async function loadPosts(forced_pagination: any = undefined, addToCurrent: boolean = false) {
         let pa = forced_pagination;
         if (pa === undefined)
@@ -64,7 +83,7 @@ export default function Feed() {
             <CitationCreator/>
             {
                 posts.map((p : any)=> {
-                    return <CitationCard body={p} key={p.id}/>
+                    return <CitationCard body={p} key={p.id} deleteCallback={userPostDelete}/>
                 })
             }
         </div>

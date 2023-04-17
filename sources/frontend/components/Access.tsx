@@ -3,7 +3,7 @@
 export async function ValidateAccess(router: any, cookieValue: string) {
     if (cookieValue === undefined || cookieValue === "") {
         await router.push("/authentification");
-        return;
+        return false;
     }
 
     let token_id = undefined;
@@ -20,8 +20,11 @@ export async function ValidateAccess(router: any, cookieValue: string) {
           },
     });
 
-    if (!res.ok)
+    if (!res.ok) {
         await router.push("/authentification");
+        return false;
+    }
+    return true;
 }
 
 export async function RemoveAccess(remover: any, router: any, cookieValue : string) {

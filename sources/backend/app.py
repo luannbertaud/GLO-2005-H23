@@ -95,16 +95,18 @@ def like():
         return 'Method not allowed', 405
 
 
-@app.route('/post', methods=['POST', 'DELETE'])
-def post():
+@app.route('/post', methods=['POST'])
+def create_post():
     if auth_service.is_token_valid(request.headers.get("X-token-id")) is False:
         return 'Invalid token', 401
-    if request.method == 'POST':
-        return posts_service.post(request.headers.get("X-token-id"), request.get_json())
-    elif request.method == 'DELETE':
-        return posts_service.delete_post(request.headers.get("X-token-id"), request.get_json())
-    else:
-        return 'Method not allowed', 405
+    return posts_service.post(request.headers.get("X-token-id"), request.get_json())
+
+
+@app.route('/post/<string:post_id>', methods=['DELETE'])
+def delete_post(post_id: str):
+    if auth_service.is_token_valid(request.headers.get("X-token-id")) is False:
+        return 'Invalid token', 401
+    return posts_service.delete_post(request.headers.get("X-token-id"), post_id)
 
 
 @app.route('/search/<string:query>', methods=['GET'])
@@ -113,7 +115,7 @@ def search_user(query: str):
         return 'Invalid token', 401
     else:
         response = users_repository.search_user(query)
-    return json.dumps(response), 200
+    return response, 200
 
 
 # ----- Notifications -----
@@ -129,7 +131,7 @@ def get_last_notifs():
     elif request.method == 'PATCH':
         if notif_service.set_read_notifs(request.headers.get("X-token-id")) is True:
             return 'Notifications marked as read', 200
-        return 'Notifications have already been read', 400
+        return 'Notifications have already been read', 200
     else:
         return 'Method not allowed', 405
 

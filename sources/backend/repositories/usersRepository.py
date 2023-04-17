@@ -174,7 +174,7 @@ class UsersRepository:
         users = []
         try:
             cursor = connection.cursor()
-            request = f"SELECT * FROM Users WHERE LOWER(username) LIKE LOWER('%{query}%') OR LOWER(email) LIKE LOWER('%{query}%@%');"
+            request = f"SELECT * FROM Users WHERE username LIKE '%{query}%';"
             cursor.execute(request)
             columns = [key[0] for key in cursor.description]
             users = [dict(zip(columns, user)) for user in cursor.fetchall()]

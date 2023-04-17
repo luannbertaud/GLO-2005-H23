@@ -1,28 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { secondsToRelative } from "@/components/TimeParsing";
-import Loading from "@/app/loading";
+import { secondsToRelative } from "./TimeParsing";
 
-async function loadNotification(id: string) {
-  await new Promise((r) => setTimeout(r, 2000));
-  // let res = await fetch("");
-  let notif = {
-    body: "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
-    timestamp: 983446381,
-  };
-  return { ...notif, timestamp: secondsToRelative(notif.timestamp) };
-}
+type notifProps = {
+  body: any
+};
 
-export default function Notification({ id }: any) {
-  const [notif, setNotif]: [any, any] = useState(undefined);
+export default function Notification({ body }: notifProps) {
 
-  useEffect(() => {
-    if (notif === undefined) loadNotification(id).then((p) => setNotif(p));
-  });
   return (
     <div className={"w-full relative"}>
-      <div className="flex items-start px-4 py-3">
+      <div className="flex items-start px-ype originates at this import.4 py-3">
         <div className="flex-shrink-0 mr-3">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -38,9 +26,11 @@ export default function Notification({ id }: any) {
         </div>
         <div className="flex-grow">
           <div className="font-medium text-sm text-gray-900">
-            Lorem Ipsum dolor sit amet.
+            { body[4] === "like" ? `${body[1]} à aimé votre citation` : null}
+            { body[4] === "comment" ? `${body[1]} à commenté votre citation` : null}
+            { body[4] === "follow" ? `${body[1]} à commencé à vous suivre` : null}
           </div>
-          <div className="mt-1 text-sm text-gray-500">Il y a 1 heure</div>
+          <div className="mt-1 text-sm text-gray-500">{secondsToRelative((Date.parse(body[2])) / 1000 )}</div>
         </div>
       </div>
     </div>

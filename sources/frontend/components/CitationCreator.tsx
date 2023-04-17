@@ -2,6 +2,8 @@
 
 import React, { useState } from "react";
 import { DynaPuff, Dancing_Script, Cinzel, Orbitron } from "next/font/google";
+import {useCookies} from "react-cookie";
+import {useRouter} from "next/navigation";
 
 const dyna = DynaPuff({ subsets: ["latin"] });
 const dancing = Dancing_Script({ subsets: ["latin"] });
@@ -9,7 +11,7 @@ const cinzel = Cinzel({ subsets: ["latin"] });
 const orbit = Orbitron({ subsets: ["latin"] });
 
 const FONT_FAMILIES = [
-  [undefined, "Arial"],
+  [``, "Arial"],
   [`${dyna.className}`, "DynaPuff"],
   [`${dancing.className}`, "Dancing"],
   [`${cinzel.className}`, "Cinzel"],
@@ -17,9 +19,39 @@ const FONT_FAMILIES = [
 ];
 
 export default function QuoteCreator() {
-  const [selectedFont, setSelectedFont] = useState("Arial");
+  const router = useRouter();
+  const [selectedFont, setSelectedFont] = useState("");
   const [quoteText, setQuoteText] = useState("");
-  const [timestamp, setTimestamp] = useState(new Date().getTime() / 1000);
+  const [toggleSubmit, setToogleSubmit] = useState(false);
+  const [timestamp, setTimestamp] = useState(new Date().toISOString().replace(/T/, ' ').replace(/\..+/, ''));
+  const [cookies]: [any, any, any] = useCookies(['user']);
+
+  async function postComment(data : any) {
+    let res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/post`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-token-id': JSON.parse(Buffer.from(cookies["ipaper_user_token"], 'base64').toString('ascii')).token_id,
+      },
+      body: JSON.stringify({
+        "author": data.author,
+        "body": data.body,
+        "police": data.police,
+        "timestamp": data.timestamp,
+      }),
+    });
+    if (res.ok) {
+        res.text().then(j => {
+            console.log(j)
+            window.location.reload();
+        })
+    } else {
+        res.json().then(j => {
+            alert(j.desc);
+        })
+    }
+}
+
 
   const handleFontChange = (event: {
     target: { value: React.SetStateAction<string> };
@@ -31,15 +63,28 @@ export default function QuoteCreator() {
     target: { value: React.SetStateAction<string> };
   }) => {
     setQuoteText(event.target.value);
+    if (event.target.value != "")
+      setToogleSubmit(true);
+    else
+      setToogleSubmit(false);
   };
 
   const handleSubmit = (event: { preventDefault: () => void }) => {
     event.preventDefault();
+    setTimestamp(new Date().toISOString().replace(/T/, ' ').replace(/\..+/, ''));
+    const policeName = FONT_FAMILIES.filter((e) => {
+      if (e[0] === selectedFont) {
+        return true
+      }
+      return false
+    });
     const newQuote = {
+      author: JSON.parse(Buffer.from(cookies["ipaper_user_token"], 'base64').toString('ascii')).username,
       body: quoteText,
-      timestamp: timestamp,
+      police: policeName[0][1],
+      timestamp: timestamp
     };
-    console.log("Submitting quote: ", newQuote);
+    postComment(newQuote);
   };
 
   return (
@@ -72,7 +117,8 @@ export default function QuoteCreator() {
           </div>
           <button
             type="submit"
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 mx-4 h-12 rounded-full border-2 inline-flex items-center justify-center"
+            disabled={!toggleSubmit}
+            className={`${toggleSubmit ? "hover:bg-blue-700 cursor-pointer" : "disabled:opacity-75 cursor-not-allowed bg-gray-300"} bg-blue-500 text-white font-bold py-2 px-4 mx-4 h-12 rounded-full border-2 inline-flex items-center justify-center`}
           >
             Submit
           </button>

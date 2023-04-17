@@ -1,3 +1,4 @@
+from datetime import datetime
 import pymysql
 
 from exceptions.InvalidParameterException import InvalidParameterException
@@ -37,7 +38,7 @@ class PostsRepository:
         author = input_post["author"]
         body = input_post["body"]
         police = input_post["police"]
-        timestamp = input_post["timestamp"]
+        timestamp = datetime.now().strftime("%Y-%m-%d %H-%M-%S")
         try:
             cursor = connection.cursor()
             request = f"INSERT INTO Posts (author, body, police, timestamp)" \
@@ -57,15 +58,16 @@ class PostsRepository:
         finally:
             connection.close()
 
-    def delete_post(self, input_post):
+    def delete_post(self, username, post_id):
         connection = self.__create_connection()
-        post_id = input_post["post_id"]
         if self.is_post_already_exists(post_id) is True:
             try:
                 cursor = connection.cursor()
-                request = f"DELETE FROM Posts WHERE is='{post_id}';"
-                cursor.execute(request)
-                return "Delete post successful", 200
+                request = f"DELETE FROM Posts WHERE id='{post_id}' AND author='{username}';"
+                success = cursor.execute(request) != 0
+                if success:
+                    return "Delete post successful", 200
+                return "Post does not belong to requesting user", 400
             finally:
                 connection.close()
         else:
