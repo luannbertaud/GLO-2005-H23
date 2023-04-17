@@ -191,15 +191,6 @@ export default function NavBar() {
           </div>
         </div>
       </div>
-      <button
-        className={`w-fit h-11 rounded-full border-2 p-2 px-4 inline-flex items-center justify-center gap-2 hover:bg-gray-100 active:bg-gray-200`}
-        onClick={() => {
-          router.push("/");
-        }}
-      >
-        <img src={"/write.svg"} className={"w-4 text-gray-400"} alt={""} />
-        New Post
-      </button>
       <Popover
         popover={() => {
           return (
