@@ -141,9 +141,13 @@ def get_last_notifs():
 
 @app.route('/posts', methods=['GET'])
 def latest_posts():
+    page = request.args.get("page") or 0
+    page_size = request.args.get("page_size") or 10
+    page = int(page)
+    page_size = int(page_size)
     if auth_service.is_token_valid(request.headers.get("X-token-id")) is False:
         return 'Invalid token', 401
-    res = posts_service.get_latest_posts(request.headers.get("X-token-id"), 0, 10)
+    res = posts_service.get_latest_posts(request.headers.get("X-token-id"), page, page_size)
     return json.dumps(res), 200
 
 

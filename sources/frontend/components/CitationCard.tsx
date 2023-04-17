@@ -6,6 +6,20 @@ import NewComment from "@/components/NewComment";
 import {secondsToRelative} from "@/components/TimeParsing";
 import {useCookies} from "react-cookie";
 import {useRouter} from "next/navigation";
+import { DynaPuff, Dancing_Script, Cinzel, Orbitron } from "next/font/google";
+
+const dyna = DynaPuff({ subsets: ["latin"] });
+const dancing = Dancing_Script({ subsets: ["latin"] });
+const cinzel = Cinzel({ subsets: ["latin"] });
+const orbit = Orbitron({ subsets: ["latin"] });
+
+const FONT_FAMILIES = [
+  [undefined, "Arial"],
+  [`${dyna.className}`, "DynaPuff"],
+  [`${dancing.className}`, "Dancing"],
+  [`${cinzel.className}`, "Cinzel"],
+  [`${orbit.className}`, "Orbitron"],
+];
 
 export default function CitationCard({ body, deleteCallback } : any) {
     const [userLiked, setUserLiked] = React.useState(body.user_like);
@@ -14,6 +28,7 @@ export default function CitationCard({ body, deleteCallback } : any) {
     const [cookies]: [any, any, any] = useCookies(['user']);
     const commentsContainerRef = React.createRef<HTMLDivElement>();
     const router = useRouter();
+    let cardFont = undefined;
     const [userIsAuthor, setUserIsAuthor]: [boolean, any] = useState(false);
 
     useEffect(() => {
@@ -21,6 +36,11 @@ export default function CitationCard({ body, deleteCallback } : any) {
             setUserIsAuthor(true);
         console.log(body.id);
     }, [cookies, body.author, body.id])
+
+    for (let font of FONT_FAMILIES) {
+        if (font[1] === body.police)
+            cardFont = font[0];
+    }
 
     async function userComment(content : string) {
         let res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/comments`, {
@@ -153,7 +173,7 @@ export default function CitationCard({ body, deleteCallback } : any) {
                     : null
                 }
             </div>
-            <p>&nbsp;&nbsp;&nbsp;&nbsp;{card.body}</p>
+            <p className={`${cardFont}`} >&nbsp;&nbsp;&nbsp;&nbsp;{card.body}</p>
             <div className={"grid grid-cols-3 gap-5 transition-all duration-700 -mb-5"}>
                 <div className={"border-t-2 w-full col-span-3"}/>
                 <button type={"button"} className={`w-fit h-11 rounded-full bg-gray-200 p-2 px-3 inline-flex items-center justify-center gap-2`} onClick={() => handleLikeClick()}>
