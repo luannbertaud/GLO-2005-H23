@@ -3,14 +3,15 @@ from datetime import datetime
 import json
 import pymysql
 
-from exceptions.InvalidParameterException import InvalidParameterException
 from repositories.usersRepository import UsersRepository
+
 
 class DateTimeEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, datetime):
             return obj.strftime("%Y-%m-%d %H:%M:%S")
         return json.JSONEncoder.default(self, obj)
+
 
 class NotificationsRepository:
 
@@ -28,6 +29,12 @@ class NotificationsRepository:
         )
 
     def get_last_notifs(self, username):
+        """
+        Méthode permettant d'obtenir les dernières notifications d'un utilisateur par ordre chronologique inverse.
+        Les notifications sont issues : D'un like sur un post, d'un commentaire sur un post, d'un nouveau follower.
+        :param username: Nom d'utilisateur pour qui obtenir les notifications.
+        :return: Liste de toutes les notifications concernant l'utilisateur.
+        """
         connection = self.__create_connection()
         try:
             cursor = connection.cursor()
@@ -47,6 +54,11 @@ class NotificationsRepository:
         finally: connection.close()
 
     def set_notifs_read(self, username):
+        """
+        Méthode permettant de marquer toutes les notifications d'un utilisateur comment étant lues.
+        :param username: Nom d'utilisateur pour qui changer les états de toutes ses notifications a 'read'.
+        :return: True si au moins une notification a été marquée comme lue.
+        """
         connection = self.__create_connection()
         try:
             cursor = connection.cursor()
