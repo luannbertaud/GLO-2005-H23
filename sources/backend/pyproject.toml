@@ -1,0 +1,20 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "instaPaper"
+version = "1.0.0"
+authors = [
+  { name="Team 30" },
+]
+description = "Package and module for GLO-2005 Ugram project"
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/luannbertaud/GLO-2005-H23"
+"Bug Tracker" = "https://github.com/luannbertaud/GLO-2005-H23/issues"
