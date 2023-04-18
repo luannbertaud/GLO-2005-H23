@@ -22,6 +22,11 @@ class LikesRepository:
         )
 
     def like(self, author, post_id):
+        """
+        Méthode permettant de créer un like dans la base de données suivant les valeurs passées en
+        paramètre. Toutes les valeurs en paramètre sont nécessaires.
+        :return: Un boolean indiquant si le like a été créé.
+        """
         connection = self.__create_connection()
         timestamp = datetime.now().strftime("%Y-%m-%d %H-%M-%S")
         if self.is_like_already_exists(author, post_id) is False:
@@ -36,6 +41,12 @@ class LikesRepository:
             raise InvalidParameterException('This post is already like by this user')
 
     def is_like_already_exists(self, author, post_id):
+        """
+        Méthode permettant de savoir si un like existe suivant l'auteur de ce like et un post cible.
+        :param author: Username de l'auteur du like recherché.
+        :param post_id: Id du post qui aurait été liké par l'auteur.
+        :return: Un boolean signifiant si oui ou non le like existe.
+        """
         connection = self.__create_connection()
         try:
             cursor = connection.cursor()
@@ -46,6 +57,11 @@ class LikesRepository:
             connection.close()
 
     def unlike(self, author, post_id):
+        """
+        Méthode permettant de supprimer un like dans la base de données suivant les valeurs passées en
+        paramètre. Toutes les valeurs en paramètre sont nécessaires.
+        :return: Un boolean indiquant si le like a été supprimé.
+        """
         connection = self.__create_connection()
         if self.is_like_already_exists(author, post_id) is True:
             try:
@@ -58,6 +74,11 @@ class LikesRepository:
             raise InvalidParameterException('This post is not already liked by this user')
 
     def count_likes_of_post(self, post_id):
+        """
+        Méthode permettant d'obtenir le nombre de likes d'un post en particulier.
+        :param post_id: L'id du post sur lequel compter les likes.
+        :return: Le nombre de likes en relation avec le post.
+        """
         connection = self.__create_connection()
         try:
             cursor = connection.cursor()
@@ -71,6 +92,11 @@ class LikesRepository:
             connection.close()
 
     def count_likes_for_user(self, username):
+        """
+        Méthode permettant d'obtenir le nombre de likes cumulés de tous les posts d'un utilisateur.
+        :param username: Le nom d'utilisateur pour qui compter le nombre de likes.
+        :return: Le nombre de likes cumulés des posts de l'utilisateur.
+        """
         connection = self.__create_connection()
         try:
             cursor = connection.cursor()
