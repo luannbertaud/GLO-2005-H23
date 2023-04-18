@@ -12,6 +12,12 @@ export default function Auth() {
     const router = useRouter();
     const [_, setCookie]: [any, any, any] = useCookies(['user']);
 
+    /**
+    * Allows the user to log in or register depending on the endpoint and grants access to the site if successful.
+    *
+    * @param event - event value to get input values
+    */
+
     async function handleSubmit(event : any) {
         event.preventDefault();
         setLoading(true);
@@ -51,6 +57,10 @@ export default function Auth() {
         }
     }
 
+    /**
+    * Allows you to display the elements necessary for the signup or not.
+    *
+    */
 
     async function toggleSignup() {
         let elements : string[] = ["firstname", "firstname-l", "lastname", "lastname-l", "username", "username-l", "bio", "bio-l"];

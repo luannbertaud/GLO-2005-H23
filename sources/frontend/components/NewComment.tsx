@@ -7,6 +7,10 @@ export default function NewComment({ newCommentCallback } : any) {
     const [cookies]: [any, any, any] = useCookies(['user']);
     const commentBodyRef = React.createRef<HTMLTextAreaElement>();
 
+    /**
+    * Listener for the New comment Callback
+    */
+
     async function handleNewComment() {
         if (commentBodyRef.current && commentBodyRef.current.value) {
             await newCommentCallback(commentBodyRef.current.value);

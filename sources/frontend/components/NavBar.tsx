@@ -32,6 +32,12 @@ export default function NavBar() {
     });
   }, []);
 
+  /**
+   * Allows you to display the menu or not.
+   *
+   * @param value
+   */
+
   function toggleMenu(value: any) {
     const menu = document.getElementById("menu");
     if (value === undefined) value = !menuOpened;
@@ -39,6 +45,10 @@ export default function NavBar() {
     else menu!.style.maxHeight = "100px";
     setMenuOpened(!menuOpened);
   }
+
+  /**
+   * Retrieves all notifications, sorts them by date and adds the badge if there are unread notifications.
+   */
 
   async function getNotifications() {
     await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/notifs`, {
@@ -70,6 +80,10 @@ export default function NavBar() {
       });
   }
 
+  /**
+   * Sets all notifications gathered in the last API calls to 'read'.
+   */
+
   async function readNotifications() {
     await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/notifs`, {
       method: "PATCH",
@@ -93,6 +107,12 @@ export default function NavBar() {
         router.push("/");
       });
   }
+
+  /**
+   * Loads all the search suggestions according to the input.
+   * 
+   * @param event - Contains the input value
+   */
 
   async function loadSuggestions(event: any) {
     const input = event.currentTarget.value;
@@ -121,6 +141,10 @@ export default function NavBar() {
         router.push("/");
       });
   }
+
+  /**
+   * Logout the user from the application and remove the menu.
+   */
 
   async function logout() {
     await RemoveAccess(removeCookie, router, cookies["ipaper_user_token"]).then(

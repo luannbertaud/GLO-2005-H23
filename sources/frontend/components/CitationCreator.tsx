@@ -26,6 +26,12 @@ export default function QuoteCreator() {
   const [timestamp, setTimestamp] = useState(new Date().toISOString().replace(/T/, ' ').replace(/\..+/, ''));
   const [cookies]: [any, any, any] = useCookies(['user']);
 
+  /**
+   * Posts the quote to the server.
+   *
+   * @param data - contains the quote font, content, timestamp and author
+   */
+
   async function postComment(data : any) {
     let res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/post`, {
       method: 'POST',
@@ -51,7 +57,6 @@ export default function QuoteCreator() {
     }
 }
 
-
   const handleFontChange = (event: {
     target: { value: React.SetStateAction<string> };
   }) => {
@@ -67,6 +72,12 @@ export default function QuoteCreator() {
     else
       setToogleSubmit(false);
   };
+
+  /**
+   * Gathers all necessary data to post the quote.
+   *
+   * @param event - submit button event
+   */
 
   const handleSubmit = (event: { preventDefault: () => void }) => {
     event.preventDefault();
