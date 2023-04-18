@@ -22,6 +22,12 @@ class UsersRepository:
         )
 
     def login(self, login_inputs):
+        """
+        Méthode permettant d'enregistrer un utilisateur comme connecté pour ce serveur.
+        Les données nécessaires dans le payload sont : 'email' et 'password'.
+        :param login_inputs: Json contenant les différentes informations nécessaires à la connexion.
+        :return: Un token de connexion valide pour l'utilisateur ou une InvalidParameterException.
+        """
         connection = self.__create_connection()
         email = login_inputs["email"]
         password = login_inputs["password"]
@@ -45,6 +51,12 @@ class UsersRepository:
             connection.close()
 
     def create_token(self, username):
+        """
+        Méthode permettant de créer un token valide pour le nom d'utilisateur passé en paramètre.
+        Le token est aussi stocké dans la mémoire de ce serveur.
+        :param username: Nom d'utilisateur pour qui générer un token.
+        :return: Un token de session valide pendant 24h.
+        """
         token_id = uuid4()
         token_creation_time = datetime.datetime.now()
         token_expire_time = datetime.datetime.now() + datetime.timedelta(days=1)
@@ -54,6 +66,10 @@ class UsersRepository:
         return new_token["token_id"]
 
     def get_username_by_email(self, email):
+        """
+        Méthode permettant d'obtenir le username d'un utilisateur à partir de son email.
+        :return: Le nom d'utilisateur correspondant à l'email en paramètre.
+        """
         connection = self.__create_connection()
         try:
             cursor = connection.cursor()
@@ -64,6 +80,12 @@ class UsersRepository:
             connection.close()
 
     def create_user(self, signup_input):
+        """
+        Méthode permettant de créer un commentaire dans la base de données suivant les valeurs du payload passées en
+        paramètre. Les valeurs du payload sont toutes nécessaires : 'username', 'email', 'first_name', 'last_name',
+        'bio' et 'password'.
+        :return: Un token de connexion valide pour l'utilisateur nouvellement créé.
+        """
         connection = self.__create_connection()
         username = signup_input["username"]
         email = signup_input['email']
@@ -86,6 +108,11 @@ class UsersRepository:
             connection.close()
 
     def delete_user(self, token_id, username):
+        """
+        Supprime un utilisateur dans la base de données.
+        :param username: Nom d'utilisateur avec lequel identifier l'utilisateur à supprimer.
+        :return: True si le commentaire a été supprimé, False sinon.
+        """
         connection = self.__create_connection()
         for stocked_token in self.tokens:
             if stocked_token["token_id"] == UUID(token_id):
@@ -98,6 +125,11 @@ class UsersRepository:
                 return affected_columns != 0
 
     def is_username_already_exists(self, username):
+        """
+        Méthode permettant de savoir si un nom d'utilisateur est déjà utilisé.
+        :param username: Nom d'utilisateur recherché.
+        :return: Un boolean signifiant si oui ou non le nom d'utilisateur existe déjà.
+        """
         connection = self.__create_connection()
         try:
             cursor = connection.cursor()
@@ -108,6 +140,11 @@ class UsersRepository:
             connection.close()
 
     def is_email_already_exists(self, email):
+        """
+        Méthode permettant de savoir si un email est déjà utilisé.
+        :param email: Email recherché.
+        :return: Un boolean signifiant si oui ou non l'email existe déjà.
+        """
         connection = self.__create_connection()
         try:
             cursor = connection.cursor()
@@ -118,6 +155,11 @@ class UsersRepository:
             connection.close()
 
     def is_token_valid(self, token_id):
+        """
+        Méthode permettant de vérifier si un token est valide. (Considéré comme connecté par ce serveur).
+        :param token_id: L'id du token devant est vérifié.
+        :return: Un boolean signifiant la validité du token.
+        """
         token_is_valid = False
         for stocked_token in self.tokens:
             if stocked_token["token_expire_time"] < datetime.datetime.now():
@@ -130,21 +172,39 @@ class UsersRepository:
         return token_is_valid
 
     def update_token(self, token_index):
+        """
+        Méthode permettant de rafraichir le délai d'expiration d'un token.
+        :param token_index: Index du token ciblé par le rafraîchissent.
+        """
         self.tokens[token_index]["token_expire_time"] = datetime.datetime.now() + datetime.timedelta(days=1)
 
     def logout(self, token_id):
+        """
+        Méthode permettant de supprimer un token de session enregistré sur ce serveur.
+        :param token_id: Id du token à supprimer.
+        """
         for stocked_token in self.tokens:
             if stocked_token["token_id"] == UUID(token_id):
                 self.tokens.remove(stocked_token)
                 break
 
     def get_user_by_token(self, token_id):
+        """
+        Méthode permettant d'obtenir le nom d'utilisateur en relation avec un token.
+        :param token_id: Identifiant du token appartenant à l'utilisateur recherché.
+        :return: Le nom d'utilisateur correspondant si trouvé, None sinon.
+        """
         for stocked_token in self.tokens:
             if stocked_token["token_id"] == UUID(token_id):
                 return stocked_token["username"]
         return None
 
     def get_user_info_by_username(self, username):
+        """
+        Méthode retournant toutes les informations stockées en base de données sur un utilisateur.
+        :param username: Nom d'utilisateur pour lequel rechercher les autres données.
+        :return: Json contenant toutes les informations sur l'utilisateur recherché.
+        """
         connection = self.__create_connection()
         user = None
         try:
@@ -160,6 +220,11 @@ class UsersRepository:
         return user
 
     def delete_user(self, token_id, username):
+        """
+        Supprime un utilisateur dans la base de données.
+        :param username: Nom d'utilisateur avec lequel identifier l'utilisateur à supprimer.
+        :return: True si le commentaire a été supprimé, False sinon.
+        """
         connection = self.__create_connection()
         try:
             cursor = connection.cursor()
@@ -170,6 +235,11 @@ class UsersRepository:
             connection.close()
 
     def search_user(self, query: str):
+        """
+        Méthode permettant de rechercher des utilisateurs suivant le contenu de leurs noms d'utilisateur.
+        :param query: Chaine de caractères partielle devant être contenu dans les noms d'utilisateurs.
+        :return: Une liste des utilisateurs correspondant à la recherche.
+        """
         connection = self.__create_connection()
         users = []
         try:
@@ -183,6 +253,11 @@ class UsersRepository:
         return users
 
     def count_followers(self, username):
+        """
+        Méthode permettant d'obtenir le nombre de personnes suivant un certain utilisateur.
+        :param username: Nom d'utilisateur pour lequel compter les followers.
+        :return: Le nombre de personnes suivant l'utilisateur ciblé.
+        """
         connection = self.__create_connection()
         try:
             cursor = connection.cursor()
@@ -196,6 +271,11 @@ class UsersRepository:
             connection.close()
 
     def count_following(self, username):
+        """
+        Méthode permettant d'obtenir le nombre de personnes étant suivis par un certain utilisateur.
+        :param username: Nom d'utilisateur pour lequel compter les followings.
+        :return: Le nombre de personnes étant suivis par l'utilisateur ciblé.
+        """
         connection = self.__create_connection()
         try:
             cursor = connection.cursor()
