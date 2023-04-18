@@ -21,6 +21,14 @@ class PostsRepository:
         )
 
     def get_latest_posts(self, page: int, page_size: int):
+        """
+        Méthode permettant d'obtenir les derniers posts de la plateforme par ordre chronologique inverse.
+        Le résultat utilise de la pagination.
+        :param page: Page actuelle à retourner de la pagination. Son origine dépend de la taille des pages.
+        :param page_size: Taille des pages à considérer. Influence la taille de la liste de retour et l'origine de la
+        page actuelle.
+        :return: Liste des posts constituant la page demandée.
+        """
         connection = self.__create_connection()
         posts = []
         try:
@@ -34,6 +42,11 @@ class PostsRepository:
         return posts
 
     def post(self, input_post):
+        """
+        Méthode permettant de créer un post dans la base de données suivant les valeurs du payload passées en
+        paramètre. Les valeurs nécessaires sont : 'author', 'body' et 'police'.
+        :return: Un tuple contenant un message d'état et un code (200 pour un succès).
+        """
         connection = self.__create_connection()
         author = input_post["author"]
         body = input_post["body"]
@@ -49,6 +62,11 @@ class PostsRepository:
             connection.close()
 
     def is_post_already_exists(self, post_id):
+        """
+        Méthode permettant de savoir si un post existe suivant un id.
+        :param post_id: Id du post recherché.
+        :return: Un boolean signifiant si oui ou non le post existe.
+        """
         connection = self.__create_connection()
         try:
             cursor = connection.cursor()
@@ -59,6 +77,12 @@ class PostsRepository:
             connection.close()
 
     def delete_post(self, username, post_id):
+        """
+        Supprime un post dans la base de données.
+        :param username: Nom d'utilisateur de l'auteur du post. (Pour des raisons de sécurité).
+        :param post_id: L'id avec lequel identifier le commentaire à supprimer.
+        :return: Un tuple contenant un message d'état et un code (200 pour un succès).
+        """
         connection = self.__create_connection()
         if self.is_post_already_exists(post_id) is True:
             try:
@@ -74,6 +98,11 @@ class PostsRepository:
             raise InvalidParameterException("This post doesn't already exists")
 
     def get_posts_of_user(self, username):
+        """
+        Méthode permettant d'obtenir une liste des posts d'un utilisateur par ordre chronologique inverse.
+        :param username: Nom d'utilisateur pour qui rechercher les posts publiés.
+        :return: Une liste des posts de l'utilisateur demandé.
+        """
         connection = self.__create_connection()
         posts = []
         try:
